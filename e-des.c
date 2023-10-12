@@ -3,33 +3,10 @@
 #include <string.h>
 #include <stdint.h>
 #include <openssl/des.h>
-#define SMALL_KEY_SIZE 8 // 64 bits
-#define KEY_SIZE 32      // 256 bits
-#define BLOCK_SIZE 8     // 64 bits
+#define KEY_SIZE 32  // 256 bits
+#define BLOCK_SIZE 8 // 64 bits
 #define NUMBER_OF_ROUNDS 16
 #define NUMBER_OF_S_BOXES 16
-
-void des_ecb_cipher(uint8_t *in,size_t in_lenght, uint8_t *out, uint8_t *key, int encrypt)
-{
-
-    DES_key_schedule schedule;
-    DES_set_key((const_DES_cblock *)key, &schedule);
-
-    if (encrypt) {
-        // Calculate the padding length and add PKCS#7 padding
-        size_t padding_length = 8 - (in_lenght * BLOCK_SIZE) % 8;
-        for (size_t padding_index = 0; padding_index < padding_length; padding_index++) {
-            in[in_lenght + padding_index] = padding_length;
-        }
-        in_lenght += padding_length;
-    }
-
-    for (size_t block_index = 0; block_index < in_lenght; block_index++)
-    {
-        // Encrypt or decrypt the block using DES ECB
-        DES_ecb_encrypt((const_DES_cblock *)(in + block_index * BLOCK_SIZE),(DES_cblock *)(out + block_index * BLOCK_SIZE), &schedule, encrypt);
-    }
-}
 
 uint8_t *read_file(FILE *file, size_t *size)
 {
@@ -97,7 +74,7 @@ int main(int argc, char **argv)
 
     int mode = strcmp(enc, "-e") == 0 ? DES_ENCRYPT : DES_DECRYPT;
 
-    des_ecb_cipher(input_content,input_size, output_content, key_blocks, mode);
+    des_ecb_cipher(input_content, input_size, output_content, key_blocks, mode);
 
     fclose(input_file);
     fclose(output_file);
