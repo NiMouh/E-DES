@@ -5,6 +5,7 @@
 #include <openssl/des.h>
 #define KEY_SIZE 32  // 256 bits
 #define BLOCK_SIZE 8 // 64 bits
+#define HALF_BLOCK_SIZE 4
 #define NUMBER_OF_ROUNDS 16
 #define NUMBER_OF_S_BOXES 16
 
@@ -128,41 +129,41 @@ uint8_t *feistel_network(const uint8_t *block, uint8_t *s_boxes)
     uint8_t ciphered_block[BLOCK_SIZE];
 
     // Split the block in two halves
-    uint8_t L[BLOCK_SIZE / 2];
-    uint8_t R[BLOCK_SIZE / 2];
+    uint8_t L[HALF_BLOCK_SIZE];
+    uint8_t R[HALF_BLOCK_SIZE];
 
-    memcpy(L, block, BLOCK_SIZE / 2);
-    memcpy(R, block + BLOCK_SIZE / 2, BLOCK_SIZE / 2);
+    memcpy(L, block, HALF_BLOCK_SIZE);
+    memcpy(R, block + HALF_BLOCK_SIZE, HALF_BLOCK_SIZE);
 
     // For each round
     for (int round = 0; round < NUMBER_OF_ROUNDS; round++)
     {
         // Copy the right half to the left half
-        memcpy(L, R, BLOCK_SIZE / 2);
+        memcpy(L, R, HALF_BLOCK_SIZE);
 
         // Apply the feistel function to the right half
         uint8_t * feistel_result = feistel_function(R, s_boxes[round]);
 
         // XOR the left half with the feistel result
-        for (int index = 0; index < BLOCK_SIZE / 2; index++)
+        for (int index = 0; index < HALF_BLOCK_SIZE; index++)
         {
             R[index] = L[index] ^ feistel_result[index];
         }
     }
 
     // Swap the left and right halves
-    memcpy(ciphered_block, R, BLOCK_SIZE / 2);
-    memcpy(ciphered_block + BLOCK_SIZE / 2, L, BLOCK_SIZE / 2);
+    memcpy(ciphered_block, R, HALF_BLOCK_SIZE);
+    memcpy(ciphered_block + HALF_BLOCK_SIZE, L, HALF_BLOCK_SIZE);
 
     return ciphered_block;
 }
 
 uint8_t * feistel_function(uint8_t * input_block, uint8_t * s_box){
-    uint8_t output_block[BLOCK_SIZE / 2];
+    uint8_t output_block[HALF_BLOCK_SIZE];
 
-    uint8_t index = input_block[BLOCK_SIZE / 2 - 1];
-    output_block[BLOCK_SIZE / 2 - 1] = s_box[index];
-    for (size_t byte_index = BLOCK_SIZE / 2 - 2; byte_index >= 0; byte_index--)
+    uint8_t index = input_block[HALF_BLOCK_SIZE - 1];
+    output_block[HALF_BLOCK_SIZE - 1] = s_box[index];
+    for (size_t byte_index = HALF_BLOCK_SIZE - 2; byte_index >= 0; byte_index--)
     {
         index += input_block[byte_index];
         output_block[byte_index] = s_box[index];
