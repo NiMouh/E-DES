@@ -7,6 +7,22 @@
  - As aplicações devem processar a entrada a partir de `stdin` e produzir um resultado para `stdout`. 
  - O E-DES (ou DES) deve ser utilizado para processar a entrada no modo ECB com um *padding* PKCS#7.
 
+## Compilar e Executar
+Para **compilar** o projeto em C, basta executar o seguinte comando:
+```console
+$ cc -o des des.c -lcrypto
+```
+
+Para **cifrar**, basta executar o seguinte comando:
+```console
+$ ./des -e <chave> <ficheiro de entrada> <ficheiro de saída>
+```
+
+Para **decifrar**, basta executar o seguinte comando:
+```console
+$ ./des -d <chave> <ficheiro de entrada> <ficheiro de saída>
+```
+
 ## Tamanhos
 - Bloco: `64 bits` (8 bytes)
 - Chave de cifra: `256 bits` (32 bytes)
@@ -43,13 +59,13 @@ uint8_t out [4];
 uint8_t index = in[3];
 out[0] = SBox[index];
 
-index = (index ^ in[2]);
+index = (index + in[2]);
 out[1] = SBox[index];
 
-index = (index ^ in[1]);
+index = (index + in[1]);
 out[2] = SBox[index];
 
-index = (index ^ in[0]);
+index = (index + in[0]);
 out[3] = SBox[index];
 ```
 
