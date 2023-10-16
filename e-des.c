@@ -286,6 +286,16 @@ uint8_t SBox_16[] = {
 
 uint8_t *s_boxes[16] = {SBox_01, SBox_02, SBox_03, SBox_04, SBox_05, SBox_06, SBox_07, SBox_08, SBox_09, SBox_10, SBox_11, SBox_12, SBox_13, SBox_14, SBox_15, SBox_16};
 
+uint8_t input_test_block[] = {
+        01, 00, 00, 00, 00, 00, 00, 00,
+        00, 01, 00, 00, 00, 00, 00, 00,
+        00, 00, 01, 00, 00, 00, 00, 00,
+        00, 00, 00, 01, 00, 00, 00, 00,
+        00, 00, 00, 00, 01, 00, 00, 00,
+        00, 00, 00, 00, 00, 01, 00, 00,
+        00, 00, 00, 00, 00, 00, 01, 00,
+        00, 00, 00, 00, 00, 00, 00, 01};
+
 uint8_t *read_file(FILE *file, size_t *size)
 {
     fseek(file, 0, SEEK_END);
@@ -428,7 +438,7 @@ uint8_t *feistel_network(const uint8_t *block)
     return ciphered_block;
 }
 
-uint8_t *encrypt(const uint8_t *plaintext) // const uint8_t *key
+uint8_t *encrypt(const uint8_t *plaintext, const uint8_t *key)
 {
     // Add padding
     size_t plaintext_len = strlen((char *)plaintext);
@@ -439,7 +449,7 @@ uint8_t *encrypt(const uint8_t *plaintext) // const uint8_t *key
 
     uint8_t *ciphertext = (uint8_t *)malloc(padded_len);
 
-    for (size_t block_index = 0; block_index < padded_len; block_index += BLOCK_SIZE)
+    for (size_t block_index = 0; block_index < padded_len; block_index += BLOCK_SIZE) // TO DO: FIX THIS FOR CICLE
     {
         // Get the block from the padded plaintext
         uint8_t block[BLOCK_SIZE];
@@ -455,9 +465,9 @@ uint8_t *encrypt(const uint8_t *plaintext) // const uint8_t *key
     return ciphertext;
 }
 
-int main(void) // int argc, char **argv
+int main(int argc, char **argv)
 {
-    /*
+
     if (argc != 5)
     {
         fprintf(stderr, "This is the following format: ./e-des <enc> <256-bit password> <in> <out>\n");
@@ -517,21 +527,13 @@ int main(void) // int argc, char **argv
 
     fclose(input_file);
     fclose(output_file);
-    */
-    uint8_t input_test_block[] = {
-        01, 00, 00, 00, 00, 00, 00, 00,
-        00, 01, 00, 00, 00, 00, 00, 00,
-        00, 00, 01, 00, 00, 00, 00, 00,
-        00, 00, 00, 01, 00, 00, 00, 00,
-        00, 00, 00, 00, 01, 00, 00, 00,
-        00, 00, 00, 00, 00, 01, 00, 00,
-        00, 00, 00, 00, 00, 00, 01, 00,
-        00, 00, 00, 00, 00, 00, 00, 01};
 
+
+    // TEST CODE
     size_t input_test_len = sizeof(input_test_block);
     uint8_t *output_test_block = malloc(input_test_len);
 
-    for (size_t block_index = 0; block_index < input_test_len; block_index += BLOCK_SIZE)
+    for (size_t block_index = 0; block_index < input_test_len; block_index += BLOCK_SIZE) // TO DO: IMPLEMENT THIS ON ENCRYPT
     {
         // Get the block from the padded plaintext
         uint8_t *block = malloc(BLOCK_SIZE);
