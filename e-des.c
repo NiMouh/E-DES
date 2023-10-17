@@ -9,6 +9,7 @@
 #define HALF_BLOCK_SIZE 4
 #define NUMBER_OF_ROUNDS 16
 #define NUMBER_OF_S_BOXES 16
+#define S_BOX_SIZE 256 // 256 bytes
 
 /**
  * @file e-des.c
@@ -28,7 +29,7 @@
  */
 struct s_box
 {
-    uint8_t s_box[256];
+    uint8_t s_box[S_BOX_SIZE];
 };
 
 /**
@@ -547,7 +548,7 @@ struct s_box *generate_s_boxes(const uint8_t *key)
     {
         for (int i = 0; i < NUMBER_OF_ROUNDS; i++)
         {
-            for (int j = 0; j < 256; j++)
+            for (int j = 0; j < S_BOX_SIZE; j++)
             {
                 sboxes[i].s_box[j] = s_boxes[i][j];
             }
@@ -673,7 +674,7 @@ uint8_t *decrypt(const uint8_t *ciphertext, size_t ciphertext_len, const uint8_t
 
     struct s_box *s_boxes = generate_s_boxes(key); // TODO: Generate the S-Boxes from the key
 
-    uint8_t *plaintext = malloc(ciphertext_len);
+    uint8_t *padded_plaintext = malloc(ciphertext_len);
 
     for (size_t block_index = 0; block_index < ciphertext_len; block_index += BLOCK_SIZE)
     {
@@ -683,12 +684,12 @@ uint8_t *decrypt(const uint8_t *ciphertext, size_t ciphertext_len, const uint8_t
 
         uint8_t *deciphered_block = invert_feistel_network(block, s_boxes);
 
-        memcpy(plaintext + block_index, deciphered_block, BLOCK_SIZE);
+        memcpy(padded_plaintext + block_index, deciphered_block, BLOCK_SIZE);
     }
 
-    // TO DO: Unpad the plaintext
+    // TO DO: Unpad the plaintext: uint8_t *plaintext = remove_padding(plaintext, plaintext_len, &padded_len);
 
-    return plaintext;
+    return padded_plaintext; // plaintext
 }
 
 /**
