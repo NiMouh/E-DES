@@ -577,7 +577,6 @@ uint8_t *encrypt(const uint8_t *plaintext, size_t plaintext_len, const uint8_t *
     struct s_box *s_boxes = generate_s_boxes(key); // TODO: Generate the S-Boxes from the key
 
     uint8_t *ciphertext = malloc(plaintext_len); // padded_len
-    printf("Ciphertext: %zu\n", plaintext_len);
 
     for (size_t block_index = 0; block_index < plaintext_len; block_index += BLOCK_SIZE) // padded_len
     {
@@ -595,6 +594,104 @@ uint8_t *encrypt(const uint8_t *plaintext, size_t plaintext_len, const uint8_t *
 }
 
 /**
+ * @brief Function responsible for reversing the Feistel function.
+ *
+ * This function reverses the S-Box substitutions applied by the feistel_function.
+ *
+ * @param input_block The block of type uint8_t that was permuted by the feistel_function.
+ * @param s_box The S-Box of type uint8_t used in the permutation.
+ *
+ * @return The block after reversing the S-Box substitutions, of type uint8_t.
+ */
+uint8_t *invert_feistel_function(const uint8_t *input_block, const uint8_t *s_box)
+{
+    uint8_t *output_block = malloc(HALF_BLOCK_SIZE);
+
+    // TO DO: Invert the S-Box substitutions
+
+    return output_block;
+}
+
+/**
+ * @brief Function responsible for reversing the Feistel network to decipher a block.
+ *
+ * This function is called iteratively for each block of text (8 bytes).
+ * The block is divided into two 4-byte blocks (L and R).
+ * Where L is passed to R, and R is calculated as the XOR between L and the result of the inverse Feistel function [f_inv(r)].
+ * The process repeats for the defined number of rounds (16 in this case).
+ *
+ * @param block The block of type uint8_t to be deciphered.
+ * @return The deciphered block of type uint8_t.
+ */
+uint8_t *invert_feistel_network(const uint8_t *block, const struct s_box *s_boxes)
+{
+    uint8_t *deciphered_block = malloc(BLOCK_SIZE);
+
+    // Split the block into two halves (L and R)
+    uint8_t *L = malloc(HALF_BLOCK_SIZE);
+    uint8_t *R = malloc(HALF_BLOCK_SIZE);
+
+    memcpy(L, block, HALF_BLOCK_SIZE);
+    memcpy(R, block + HALF_BLOCK_SIZE, HALF_BLOCK_SIZE);
+
+    uint8_t *M = malloc(HALF_BLOCK_SIZE);
+    for (int round = NUMBER_OF_ROUNDS - 1; round >= 0; round--)
+    {
+        // Copy the left to a temporary variable
+        memcpy(M, L, HALF_BLOCK_SIZE);
+
+        // Apply the inverse Feistel function to the right half
+        uint8_t *feistel_result = invert_feistel_function(R, s_boxes[round].s_box);
+
+        for (int index = 0; index < HALF_BLOCK_SIZE; index++)
+        {
+            L[index] = R[index] ^ feistel_result[index];
+        }
+
+        memcpy(R, M, HALF_BLOCK_SIZE);
+    }
+
+    memcpy(deciphered_block, L, HALF_BLOCK_SIZE);
+    memcpy(deciphered_block + HALF_BLOCK_SIZE, R, HALF_BLOCK_SIZE);
+
+    return deciphered_block;
+}
+
+/**
+ * @brief Função responsável pela decifragem.
+ *
+ * Esta função recebe o texto cifrado na sua integra e a chave, e aplicando aquilo que foi feito nas funções anteriores, decifrado o texto.
+ *
+ * @param ciphertext O texto cifrado do tipo uint8_t que vai ser decifrado.
+ * @param ciphertext_len O tamanho do tipo size_t do texto cifrado.
+ * @param key A chave do tipo uint8_t que vai ser usada para decifrar o texto.
+ *
+ * @return O texto decifrado do tipo uint8_t.
+ */
+uint8_t *decrypt(const uint8_t *ciphertext, size_t ciphertext_len, const uint8_t *key)
+{
+
+    struct s_box *s_boxes = generate_s_boxes(key); // TODO: Generate the S-Boxes from the key
+
+    uint8_t *plaintext = malloc(ciphertext_len);
+
+    for (size_t block_index = 0; block_index < ciphertext_len; block_index += BLOCK_SIZE)
+    {
+
+        uint8_t *block = malloc(BLOCK_SIZE);
+        memcpy(block, ciphertext + block_index, BLOCK_SIZE);
+
+        uint8_t *deciphered_block = invert_feistel_network(block, s_boxes);
+
+        memcpy(plaintext + block_index, deciphered_block, BLOCK_SIZE);
+    }
+
+    // TO DO: Unpad the plaintext
+
+    return plaintext;
+}
+
+/**
  * @brief Função Main.
  *
  * Esta função é a função principal do programa.
@@ -604,7 +701,7 @@ uint8_t *encrypt(const uint8_t *plaintext, size_t plaintext_len, const uint8_t *
  *
  * @return 0 se o programa terminar com sucesso, 1 caso contrário.
  */
-int main(int argc, char **argv) // int argc, char **argv
+int main(int argc, char **argv)
 {
     if (argc != 5)
     {
@@ -656,7 +753,7 @@ int main(int argc, char **argv) // int argc, char **argv
     }
     else
     {
-        output_content = decrypt(input_content, key_blocks);
+        output_content = decrypt(input_content, input_size, key_blocks);
     }
 
     size_t output_size = strlen((char *)output_content);
@@ -679,6 +776,31 @@ int main(int argc, char **argv) // int argc, char **argv
 
     size_t input_test_block_len = sizeof(input_test_block);
     uint8_t *ciphertext = encrypt(input_test_block, input_test_block_len, NULL);
+
+    printf("Ciphertext: ");
+    for (int i = 0; i < BLOCK_SIZE; i++)
+    {
+        for (int j = 0; j < BLOCK_SIZE; j++)
+        {
+            printf("%02x ", ciphertext[i * BLOCK_SIZE + j]);
+        }
+        printf("\n");
+    }
+
+    printf("\n");
+
+    size_t output_test_block_len = sizeof(ciphertext);
+    uint8_t *plaintext = decrypt(ciphertext, output_test_block_len, NULL);
+
+    printf("Plaintext: ");
+    for (int i = 0; i < BLOCK_SIZE; i++)
+    {
+        for (int j = 0; j < BLOCK_SIZE; j++)
+        {
+            printf("%02x ", plaintext[i * BLOCK_SIZE + j]);
+        }
+        printf("\n");
+    }
 
     return 0;
 }
