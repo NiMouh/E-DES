@@ -571,9 +571,7 @@ struct s_box *generate_s_boxes(const uint8_t *key)
  */
 uint8_t *encrypt(const uint8_t *plaintext, size_t plaintext_len, const uint8_t *key)
 {
-    // Padding
-    size_t padded_len = plaintext_len;
-    // uint8_t *padded_plaintext = add_padding(plaintext, plaintext_len, &padded_len);
+    // TO DO: Add Padding uint8_t *padded_plaintext = add_padding(plaintext, plaintext_len, &padded_len);
 
     struct s_box *s_boxes = generate_s_boxes(key); // TODO: Generate the S-Boxes from the key
 
@@ -595,25 +593,6 @@ uint8_t *encrypt(const uint8_t *plaintext, size_t plaintext_len, const uint8_t *
 }
 
 /**
- * @brief Function responsible for reversing the Feistel function.
- *
- * This function reverses the S-Box substitutions applied by the feistel_function.
- *
- * @param input_block The block of type uint8_t that was permuted by the feistel_function.
- * @param s_box The S-Box of type uint8_t used in the permutation.
- *
- * @return The block after reversing the S-Box substitutions, of type uint8_t.
- */
-uint8_t *invert_feistel_function(const uint8_t *input_block, const uint8_t *s_box)
-{
-    uint8_t *output_block = malloc(HALF_BLOCK_SIZE);
-
-    // TO DO: Invert the S-Box substitutions
-
-    return output_block;
-}
-
-/**
  * @brief Function responsible for reversing the Feistel network to decipher a block.
  *
  * This function is called iteratively for each block of text (8 bytes).
@@ -632,6 +611,12 @@ uint8_t *invert_feistel_network(const uint8_t *block, const struct s_box *s_boxe
     uint8_t *L = malloc(HALF_BLOCK_SIZE);
     uint8_t *R = malloc(HALF_BLOCK_SIZE);
 
+    if (L == NULL || R == NULL) // memory allocation error
+    {
+        perror("Failed to allocate memory for L and R");
+        exit(1);
+    }
+
     memcpy(L, block, HALF_BLOCK_SIZE);
     memcpy(R, block + HALF_BLOCK_SIZE, HALF_BLOCK_SIZE);
 
@@ -642,7 +627,7 @@ uint8_t *invert_feistel_network(const uint8_t *block, const struct s_box *s_boxe
         memcpy(M, L, HALF_BLOCK_SIZE);
 
         // Apply the inverse Feistel function to the right half
-        uint8_t *feistel_result = invert_feistel_function(R, s_boxes[round].s_box);
+        uint8_t *feistel_result = feistel_function(L, s_boxes[round].s_box);
 
         for (int index = 0; index < HALF_BLOCK_SIZE; index++)
         {
@@ -775,10 +760,10 @@ int main(int argc, char **argv)
         00, 00, 00, 00, 00, 00, 01, 00,
         00, 00, 00, 00, 00, 00, 00, 01};
 
-    size_t input_test_block_len = sizeof(input_test_block);
+    size_t input_test_block_len = sizeof(input_test_block); // Note: strlen((char *)input_test_block) if the input is unknown
     uint8_t *ciphertext = encrypt(input_test_block, input_test_block_len, NULL);
 
-    printf("Ciphertext: ");
+    printf("Ciphertext:\n");
     for (int i = 0; i < BLOCK_SIZE; i++)
     {
         for (int j = 0; j < BLOCK_SIZE; j++)
@@ -788,12 +773,10 @@ int main(int argc, char **argv)
         printf("\n");
     }
 
-    printf("\n");
-
-    size_t output_test_block_len = sizeof(ciphertext);
+    size_t output_test_block_len = strlen((char *)ciphertext); // BUT WHY?!
     uint8_t *plaintext = decrypt(ciphertext, output_test_block_len, NULL);
 
-    printf("Plaintext: ");
+    printf("Plaintext:\n");
     for (int i = 0; i < BLOCK_SIZE; i++)
     {
         for (int j = 0; j < BLOCK_SIZE; j++)
