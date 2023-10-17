@@ -10,7 +10,32 @@
 #define NUMBER_OF_ROUNDS 16
 #define NUMBER_OF_S_BOXES 16
 
-// Test Variables
+/**
+ * @file e-des.c
+ * @brief Implementação da variante do algoritmo DES, o E-DES.
+ *
+ * Este ficheiro contém o código necessário para a implementação da variante do algoritmo DES, o E-DES.
+ *
+ * @author Simão Andrade, Ana Vidal
+ * @date   Outubro 17, 2023
+ */
+
+/**
+ * @struct S-Box
+ * @brief Estrutura que contém as S-Boxes.
+ *
+ * Esta estrutura contém um array de 256 posições, que representa uma S-Box.
+ */
+struct s_box
+{
+    uint8_t s_box[256];
+};
+
+/**
+ * @brief Variáveis globais.
+ *
+ * Estas variáveis são usadas para testar as funções implementadas. Contém valores estáticos e incrementais.
+ */
 uint8_t SBox_01[] = {
     0x00, 0x00, 0x01, 0x01, 0x02, 0x02, 0x03, 0x03, 0x04, 0x04, 0x05, 0x05, 0x06, 0x06, 0x07, 0x07,
     0x08, 0x08, 0x09, 0x09, 0x0a, 0x0a, 0x0b, 0x0b, 0x0c, 0x0c, 0x0d, 0x0d, 0x0e, 0x0e, 0x0f, 0x0f,
@@ -286,16 +311,15 @@ uint8_t SBox_16[] = {
 
 uint8_t *s_boxes[16] = {SBox_01, SBox_02, SBox_03, SBox_04, SBox_05, SBox_06, SBox_07, SBox_08, SBox_09, SBox_10, SBox_11, SBox_12, SBox_13, SBox_14, SBox_15, SBox_16};
 
-uint8_t input_test_block[] = {
-        01, 00, 00, 00, 00, 00, 00, 00,
-        00, 01, 00, 00, 00, 00, 00, 00,
-        00, 00, 01, 00, 00, 00, 00, 00,
-        00, 00, 00, 01, 00, 00, 00, 00,
-        00, 00, 00, 00, 01, 00, 00, 00,
-        00, 00, 00, 00, 00, 01, 00, 00,
-        00, 00, 00, 00, 00, 00, 01, 00,
-        00, 00, 00, 00, 00, 00, 00, 01};
-
+/**
+ * @brief Função que lê o ficheiro.
+ *
+ * Esta função lê o ficheiro e retorna o seu conteúdo.
+ *
+ * @param file O ficheiro do tipo FILE que vai ser lido.
+ * @param size O tamanho do tipo size_t do ficheiro.
+ * @return O conteúdo do ficheiro.
+ */
 uint8_t *read_file(FILE *file, size_t *size)
 {
     fseek(file, 0, SEEK_END);
@@ -308,6 +332,16 @@ uint8_t *read_file(FILE *file, size_t *size)
     return content;
 }
 
+/**
+ * @brief Função que escreve no ficheiro.
+ *
+ * Esta função escreve no ficheiro o conteúdo que recebe.
+ *
+ * @param file O ficheiro do tipo FILE que vai ser escrito.
+ * @param content O conteúdo do tipo uint8_t que vai ser escrito no ficheiro.
+ * @param size O tamanho do tipo size_t do conteúdo.
+ * @return void
+ */
 void write_file(FILE *file, uint8_t *content, size_t size)
 {
     if (content == NULL)
@@ -322,6 +356,22 @@ void write_file(FILE *file, uint8_t *content, size_t size)
     free(content);
 }
 
+/**
+ * @brief Função que adiciona padding ao texto.
+ *
+ * Esta função adiciona padding ao texto usando o esquema PKCS#7.
+ * Verifica se o último bloco é múltiplo do tamanho do bloco, se não for adiciona padding de modo a encher o bloco.
+ * Caso contrário, adiciona um bloco com o tamanho do bloco.
+ *
+ * @param plaintext O texto do tipo uint8_t que vai ser adicionado padding.
+ * @param plaintext_length O tamanho do tipo size_t do texto.
+ * @param padded_length O tamanho do tipo size_t do texto com padding.
+ *
+ * @return O texto com padding do tipo uint8_t.
+ *
+ * @see https://www.ibm.com/docs/en/zos/2.4.0?topic=rules-pkcs-padding-method
+ * @see https://en.wikipedia.org/wiki/PKCS_7
+ */
 uint8_t *add_padding(const uint8_t *plaintext, size_t plaintext_length, size_t *padded_length)
 {
     // Calculate the new padded length
@@ -348,6 +398,22 @@ uint8_t *add_padding(const uint8_t *plaintext, size_t plaintext_length, size_t *
     return padded_plaintext;
 }
 
+/**
+ * @brief Função que remove o padding do texto.
+ *
+ * Esta função remove o padding do texto usando o esquema PKCS#7.
+ * Primeiro é obtido o último valor do texto com padding, que é o número de bytes de padding.
+ * Depois é subtraído essa mesma quantidade ao tamanho do texto com padding, obtendo assim o tamanho do texto sem padding.
+ *
+ * @param padded_plaintext O texto do tipo uint8_t que vai ser removido o padding.
+ * @param padded_length O tamanho do tipo size_t do texto com padding.
+ * @param plaintext_length O tamanho do tipo size_t do texto sem padding.
+ *
+ * @return O texto sem padding do tipo uint8_t.
+ *
+ *  * @see https://www.ibm.com/docs/en/zos/2.4.0?topic=rules-pkcs-padding-method
+ * @see https://en.wikipedia.org/wiki/PKCS_7
+ */
 uint8_t *remove_padding(const uint8_t *padded_plaintext, size_t padded_length, size_t *plaintext_length)
 {
     // Check if the input length is valid
@@ -383,6 +449,18 @@ uint8_t *remove_padding(const uint8_t *padded_plaintext, size_t padded_length, s
     return plaintext;
 }
 
+/**
+ * @brief Função feistel que faz a permutação inicial.
+ *
+ * Esta função através da S-Box recebida, transforma os 4 bytes do bloco, byte a byte.
+ * Isto é feito obtendo o valor do byte com maior endereço de memória do input, e somando-o ao índice da S-Box.
+ *
+ * @param input_block O bloco do tipo uint8_t que vai ser permutado.
+ * @param s_box A S-Box do tipo uint8_t que vai ser usada na permutação.
+ *
+ * @return O bloco permutado do tipo uint8_t.
+ * @see https://en.wikipedia.org/wiki/Feistel_cipher
+ */
 uint8_t *feistel_function(const uint8_t *input_block, const uint8_t *s_box)
 {
     uint8_t *output_block = malloc(HALF_BLOCK_SIZE);
@@ -402,7 +480,19 @@ uint8_t *feistel_function(const uint8_t *input_block, const uint8_t *s_box)
     return output_block;
 }
 
-uint8_t *feistel_network(const uint8_t *block)
+/**
+ * @brief Função responsável pela rede de feistel.
+ *
+ * Esta função é chamada iterativamente para cada bloco do texto (8 bytes).
+ * Este é dividido em dois blocos de 4 bytes (L e R).
+ * Onde o R é passado para o bloco L, e o L vai ser cálculado o xOR entre ele o R após a aplicação da função feistel [f(r)].
+ * O processo repete-se até ao número de rondas definido (16 no caso).
+ *
+ * @param block O bloco do tipo uint8_t que vai ser permutado.
+ * @return O bloco permutado do tipo uint8_t.
+ * @see https://en.wikipedia.org/wiki/Feistel_cipher
+ */
+uint8_t *feistel_network(const uint8_t *block, const struct s_box *s_boxes)
 {
     uint8_t *ciphered_block = malloc(BLOCK_SIZE);
 
@@ -413,16 +503,14 @@ uint8_t *feistel_network(const uint8_t *block)
     memcpy(L, block, HALF_BLOCK_SIZE);
     memcpy(R, block + HALF_BLOCK_SIZE, HALF_BLOCK_SIZE);
 
-    uint8_t * M = malloc(HALF_BLOCK_SIZE);
-    // For each round
+    uint8_t *M = malloc(HALF_BLOCK_SIZE);
     for (int round = 0; round < NUMBER_OF_ROUNDS; round++)
     {
         // Copy the right to a temporary variable
         memcpy(M, R, HALF_BLOCK_SIZE);
 
         // Apply the feistel function to the right half
-        uint8_t *feistel_result = feistel_function(R, s_boxes[round]);
-
+        uint8_t *feistel_result = feistel_function(R, s_boxes[round].s_box);
 
         for (int index = 0; index < HALF_BLOCK_SIZE; index++)
         {
@@ -438,36 +526,86 @@ uint8_t *feistel_network(const uint8_t *block)
     return ciphered_block;
 }
 
-uint8_t *encrypt(const uint8_t *plaintext, const uint8_t *key)
+/**
+ * @brief Função que vai gerar as S-Boxes.
+ *
+ * Esta função vai gerar as S-Boxes a partir da chave recebida. (Ainda por Fazer)
+ *
+ * @param key A chave do tipo uint8_t que vai ser usada para gerar as S-Boxes.
+ * @return Uma lista de S-Boxes do tipo struct s_box.
+ */
+struct s_box *generate_s_boxes(const uint8_t *key)
 {
-    // Add padding
-    size_t plaintext_len = strlen((char *)plaintext);
-    size_t padded_len;
-    uint8_t *padded_plaintext = add_padding(plaintext, plaintext_len, &padded_len);
+    struct s_box *sboxes = malloc(NUMBER_OF_ROUNDS * sizeof(struct s_box));
+    if (sboxes == NULL)
+    { // memory allocation error
+        perror("Failed to allocate memory for S-boxes");
+        exit(1);
+    }
 
-    // TODO: Generate the S-Boxes from the key: generate_s_boxes(uint8_t *key)
-
-    uint8_t *ciphertext = (uint8_t *)malloc(padded_len);
-
-    for (size_t block_index = 0; block_index < padded_len; block_index += BLOCK_SIZE) // TO DO: FIX THIS FOR CICLE
+    if (key == NULL) // if it's null add the global declared s_boxes
     {
-        // Get the block from the padded plaintext
-        uint8_t block[BLOCK_SIZE];
-        memcpy(block, padded_plaintext + block_index, BLOCK_SIZE);
-        // Start the feistel network with the block and the key: feistel_network(uint8_t *block, uint8_t * s_boxes)
-        uint8_t *ciphered_block = feistel_network(block);
-        // Copy the result to the ciphertext
+        for (int i = 0; i < NUMBER_OF_ROUNDS; i++)
+        {
+            for (int j = 0; j < 256; j++)
+            {
+                sboxes[i].s_box[j] = s_boxes[i][j];
+            }
+        }
+    }
+
+    return sboxes;
+}
+
+/**
+ * @brief Função responsável pela cifragem.
+ *
+ * Esta função recebe o texto na sua integra e a chave, e aplicando aquilo que foi feito nas funções anteriores, cifrado o texto.
+ *
+ * @param plaintext O texto do tipo uint8_t que vai ser cifrado.
+ * @param plaintext_len O tamanho do tipo size_t do texto.
+ * @param key A chave do tipo uint8_t que vai ser usada para cifrar o texto.
+ *
+ * @return O texto cifrado do tipo uint8_t.
+ */
+uint8_t *encrypt(const uint8_t *plaintext, size_t plaintext_len, const uint8_t *key)
+{
+    // Padding
+    size_t padded_len = plaintext_len;
+    // uint8_t *padded_plaintext = add_padding(plaintext, plaintext_len, &padded_len);
+
+    struct s_box *s_boxes = generate_s_boxes(key); // TODO: Generate the S-Boxes from the key
+
+    uint8_t *ciphertext = malloc(plaintext_len); // padded_len
+    printf("Ciphertext: %zu\n", plaintext_len);
+
+    for (size_t block_index = 0; block_index < plaintext_len; block_index += BLOCK_SIZE) // padded_len
+    {
+        uint8_t *block = malloc(BLOCK_SIZE);
+        memcpy(block, plaintext + block_index, BLOCK_SIZE); // padded_plaintext -> plaintext
+
+        uint8_t *ciphered_block = feistel_network(block, s_boxes);
+
         memcpy(ciphertext + block_index, ciphered_block, BLOCK_SIZE);
     }
 
-    free(padded_plaintext);
+    // free(padded_plaintext);
 
     return ciphertext;
 }
 
-int main(int argc, char **argv)
+/**
+ * @brief Função Main.
+ *
+ * Esta função é a função principal do programa.
+ *
+ * @param argc O número de argumentos.
+ * @param argv Os argumentos.
+ *
+ * @return 0 se o programa terminar com sucesso, 1 caso contrário.
+ */
+int main(int argc, char **argv) // int argc, char **argv
 {
-
     if (argc != 5)
     {
         fprintf(stderr, "This is the following format: ./e-des <enc> <256-bit password> <in> <out>\n");
@@ -514,7 +652,7 @@ int main(int argc, char **argv)
 
     if (cipher)
     {
-        output_content = encrypt(input_content, key_blocks);
+        output_content = encrypt(input_content, input_size, key_blocks);
     }
     else
     {
@@ -528,30 +666,19 @@ int main(int argc, char **argv)
     fclose(input_file);
     fclose(output_file);
 
+    // Note: TO TEST THIS, COMMENT THE MAIN FUNCTION ABOVE
+    uint8_t input_test_block[] = {
+        01, 00, 00, 00, 00, 00, 00, 00,
+        00, 01, 00, 00, 00, 00, 00, 00,
+        00, 00, 01, 00, 00, 00, 00, 00,
+        00, 00, 00, 01, 00, 00, 00, 00,
+        00, 00, 00, 00, 01, 00, 00, 00,
+        00, 00, 00, 00, 00, 01, 00, 00,
+        00, 00, 00, 00, 00, 00, 01, 00,
+        00, 00, 00, 00, 00, 00, 00, 01};
 
-    // TEST CODE
-    size_t input_test_len = sizeof(input_test_block);
-    uint8_t *output_test_block = malloc(input_test_len);
-
-    for (size_t block_index = 0; block_index < input_test_len; block_index += BLOCK_SIZE) // TO DO: IMPLEMENT THIS ON ENCRYPT
-    {
-        // Get the block from the padded plaintext
-        uint8_t *block = malloc(BLOCK_SIZE);
-        memcpy(block, input_test_block + block_index, BLOCK_SIZE);
-
-        // Start the feistel network with the block and the key: feistel_network(uint8_t *block)
-        uint8_t *ciphered_block = feistel_network(block);
-
-        printf("Cipher Block:");
-        for (size_t i = 0; i < BLOCK_SIZE; i++)
-        {
-            printf(" %02x", ciphered_block[i]);
-        }
-        printf("\n");
-
-        // Copy the result to the ciphertext
-        memcpy(output_test_block + block_index, ciphered_block, BLOCK_SIZE);
-    }
+    size_t input_test_block_len = sizeof(input_test_block);
+    uint8_t *ciphertext = encrypt(input_test_block, input_test_block_len, NULL);
 
     return 0;
 }
