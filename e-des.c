@@ -286,12 +286,58 @@ uint8_t SBox_16[] = {
 
 uint8_t *s_boxes[16] = {SBox_01, SBox_02, SBox_03, SBox_04, SBox_05, SBox_06, SBox_07, SBox_08, SBox_09, SBox_10, SBox_11, SBox_12, SBox_13, SBox_14, SBox_15, SBox_16};
 
+/**
+ * Struct that represents a sbox
+ * 
+ * @param sbox the sbox (uint8_t array)
+*/
 struct s_box
 {
     uint8_t sbox[S_BOX_SIZE];
 };
 
-// Function that does the feistel function, it receives the right half of the block, the sbox and a pointer to the feistel result
+/**
+ * Function that reads the bytes from stdin, it receives a pointer to the uint8_t array and a pointer to the size of the array
+ * 
+ * @param readed_bytes pointer to the uint8_t array
+ * @param number_of_readed_bytes pointer to the size of the array (size_t)
+*/
+void read_bytes(uint8_t *readed_bytes, size_t *number_of_readed_bytes)
+{
+    uint8_t byte;
+    *number_of_readed_bytes = 0;
+
+    int IS_READED = 1;
+    while (fread(&byte, sizeof(uint8_t), 1, stdin) == IS_READED)
+    {
+        readed_bytes[*number_of_readed_bytes] = byte;
+        *number_of_readed_bytes = *number_of_readed_bytes + 1;
+    }
+}
+
+/**
+ * Function that writes the bytes to stdout, it receives a pointer to the uint8_t array and the number of bytes to write
+ * 
+ * @param bytes_to_write pointer to the uint8_t array
+ * @param number_of_bytes_to_write number of bytes to write (size_t)
+*/
+void write_bytes(const uint8_t *bytes_to_write, const size_t number_of_bytes_to_write)
+{
+    for (int byte_writed = 0; byte_writed < number_of_bytes_to_write; byte_writed++)
+    {
+        fwrite(&bytes_to_write[byte_writed], sizeof(uint8_t), 1, stdout);
+    }
+}
+
+/**
+ * Function that does the feistel function operation, it receives the input block and the sbox
+ * 
+ * @param input_block the input block (uint8_t array)
+ * @param s_box the sbox (uint8_t array)
+ * 
+ * @return the output block (uint8_t array)
+ * 
+*/
 uint8_t *feistel_function(const uint8_t *input_block, const uint8_t *s_box)
 {
     uint8_t *output_block = malloc(HALF_BLOCK_SIZE);
@@ -311,13 +357,17 @@ uint8_t *feistel_function(const uint8_t *input_block, const uint8_t *s_box)
     return output_block;
 }
 
-
-// Function that handles the feistel network, it receives the block, the sboxes and a pointer to the cipher block
+/**
+ * Function that handles the feistel network used to cipher, it receives the block that will be divided in two halfs, the sboxes and a pointer to the cipher block
+ * 
+ * @param block the block (uint8_t array)
+ * @param sboxes the sboxes (struct s_box array)
+ * @param cipher_block pointer of the cipher block pointer (uint8_t array)
+*/
 void feistel_network(const uint8_t *block, const struct s_box *sboxes, uint8_t **cipher_block)
 {
-    // Split the block in two halfs (L and R)
-    uint8_t *L = (uint8_t *) malloc(HALF_BLOCK_SIZE);
-    uint8_t *R = (uint8_t *) malloc(HALF_BLOCK_SIZE);
+    uint8_t *L = (uint8_t *)malloc(HALF_BLOCK_SIZE);
+    uint8_t *R = (uint8_t *)malloc(HALF_BLOCK_SIZE);
 
     if (L == NULL || R == NULL) // memory allocation error
     {
@@ -325,10 +375,11 @@ void feistel_network(const uint8_t *block, const struct s_box *sboxes, uint8_t *
         exit(1);
     }
 
+    // Split the block in two halfs (L and R)
     memcpy(L, block, HALF_BLOCK_SIZE);
     memcpy(R, block + HALF_BLOCK_SIZE, HALF_BLOCK_SIZE);
 
-    uint8_t *M = (uint8_t *) malloc(HALF_BLOCK_SIZE);
+    uint8_t *M = (uint8_t *)malloc(HALF_BLOCK_SIZE);
     for (int round = 0; round < NUMBER_OF_ROUNDS; round++)
     {
         // Copy the right to a temporary variable
@@ -350,11 +401,15 @@ void feistel_network(const uint8_t *block, const struct s_box *sboxes, uint8_t *
     memcpy(*cipher_block + HALF_BLOCK_SIZE, R, HALF_BLOCK_SIZE);
 }
 
-// Function that handles the inverse feistel network, it receives the block, the sboxes and a pointer to the cipher block
+/**
+ * Function that handles the inverse feistel network used to decipher, it receives the block that will be divided in two halfs, the sboxes and a pointer to the cipher block
+ * 
+ * @param block the block (uint8_t array)
+ * @param sboxes the sboxes (struct s_box array)
+ * @param cipher_block pointer of the cipher block pointer (uint8_t array)
+*/
 void inverse_feistel_network(const uint8_t *block, const struct s_box *sboxes, uint8_t **cipher_block)
 {
-
-    // Split the block in two halfs (L and R)
     uint8_t *L = malloc(HALF_BLOCK_SIZE);
     uint8_t *R = malloc(HALF_BLOCK_SIZE);
 
@@ -364,6 +419,7 @@ void inverse_feistel_network(const uint8_t *block, const struct s_box *sboxes, u
         exit(1);
     }
 
+    // Split the block in two halfs (L and R)
     memcpy(L, block, HALF_BLOCK_SIZE);
     memcpy(R, block + HALF_BLOCK_SIZE, HALF_BLOCK_SIZE);
 
@@ -389,11 +445,16 @@ void inverse_feistel_network(const uint8_t *block, const struct s_box *sboxes, u
     memcpy(*cipher_block + HALF_BLOCK_SIZE, R, HALF_BLOCK_SIZE);
 }
 
-// Function that generates the sboxes by the key, it receives the key and a pointer to a struct array of sboxes
+/**
+ * Function that generates the sboxes by the key
+ * 
+ * @param key the key (uint8_t array)
+ * @param sboxes pointer to the sboxes (struct s_box array)
+*/
 void generate_sboxes(const uint8_t *key, struct s_box *sboxes)
 {
+    // TODO: Generate the sboxes by the key
 
-    // 1. Generate the sboxes by the key
     if (key == NULL) // if it's null add the global declared s_boxes
     {
         for (int i = 0; i < NUMBER_OF_ROUNDS; i++)
@@ -406,7 +467,14 @@ void generate_sboxes(const uint8_t *key, struct s_box *sboxes)
     }
 }
 
-// Function that adds padding to the plaintext
+/**
+ * Function that will apply the PCKS#7 padding to the plaintext, it receives the plaintext, the plaintext length, a pointer to the padded plaintext and a pointer to the padded length
+ * 
+ * @param plaintext the plaintext (uint8_t array)
+ * @param plaintext_length the plaintext length (size_t)
+ * @param padded_plaintext pointer to the padded plaintext (uint8_t array)
+ * @param padded_length pointer to the padded length (size_t)
+*/
 void add_padding(const uint8_t *plaintext, size_t plaintext_length, uint8_t **padded_plaintext, size_t *padded_length)
 {
     // Calculate the new padded length
@@ -432,20 +500,23 @@ void add_padding(const uint8_t *plaintext, size_t plaintext_length, uint8_t **pa
     }
 }
 
-// Function that removes padding from the plaintext
+/**
+ * Function that will remove the PCKS#7 padding from the padded plaintext, it receives the padded plaintext, the padded plaintext length, a pointer to the plaintext and a pointer to the plaintext length
+ * 
+ * @param padded_plaintext the padded plaintext (uint8_t array)
+ * @param padded_length the padded plaintext length (size_t)
+ * @param plaintext pointer to the plaintext (uint8_t array)
+ * @param plaintext_length pointer to the plaintext length (size_t)
+*/
 void remove_padding(const uint8_t *padded_plaintext, size_t padded_length, uint8_t **plaintext, size_t *plaintext_length)
 {
-    // Get the number of padding bytes
     size_t padding_bytes = padded_plaintext[padded_length - 1] - '0';
-
-    // Calculate the new plaintext length
     *plaintext_length = padded_length - padding_bytes;
 
-    // Allocate memory for plaintext
     *plaintext = (uint8_t *)malloc(*plaintext_length);
 
-    if (*plaintext == NULL)
-    { // memory allocation error
+    if (*plaintext == NULL) // memory allocation error
+    { 
         fprintf(stderr, "Error allocating memory for plaintext\n");
         exit(1);
     }
@@ -454,18 +525,22 @@ void remove_padding(const uint8_t *padded_plaintext, size_t padded_length, uint8
     memcpy(*plaintext, padded_plaintext, *plaintext_length);
 }
 
-// Encrypt Function, receives the plaintext, the key and a pointer to the ciphertext
+/**
+ * Encrypt Function, receives the plaintext, the key and a pointer to the ciphertext
+ * 
+ * @param plaintext the plaintext (uint8_t array)
+ * @param key the key (uint8_t array)
+ * @param ciphertext pointer to the ciphertext (uint8_t array)
+ * @param ciphertext_size pointer to the ciphertext size (size_t)
+*/
 void encrypt(const uint8_t *plaintext, const uint8_t *key, uint8_t **ciphertext, size_t *ciphertext_size)
 {
-    // Get plaintext size
     size_t plaintext_size = strlen((char *)plaintext);
 
-    // 1. Add Padding
     uint8_t *padded_plaintext;
     size_t padded_plaintext_size;
     add_padding(plaintext, plaintext_size, &padded_plaintext, &padded_plaintext_size);
 
-    // 2. Generate the sboxes by the key
     struct s_box *sboxes = malloc(sizeof(struct s_box) * NUMBER_OF_ROUNDS);
 
     if (sboxes == NULL) // memory allocation error
@@ -476,7 +551,6 @@ void encrypt(const uint8_t *plaintext, const uint8_t *key, uint8_t **ciphertext,
 
     generate_sboxes(key, sboxes);
 
-    // Initialize the ciphertext
     *ciphertext = (uint8_t *)malloc(padded_plaintext_size);
 
     if (*ciphertext == NULL) // Check for memory allocation error
@@ -485,17 +559,14 @@ void encrypt(const uint8_t *plaintext, const uint8_t *key, uint8_t **ciphertext,
         exit(1);
     }
 
-    // 3. For each block run the feistel network and save the block result in the ciphertext
     for (size_t block_index = 0; block_index < padded_plaintext_size; block_index += BLOCK_SIZE)
     {
         uint8_t *block = malloc(BLOCK_SIZE);
         memcpy(block, padded_plaintext + block_index, BLOCK_SIZE);
 
-        // 3.1. Run the feistel network
         uint8_t *cipher_block = malloc(BLOCK_SIZE);
         feistel_network(block, sboxes, &cipher_block);
 
-        // 3.2. Save the block result in the ciphertext
         memcpy(*ciphertext + block_index, cipher_block, BLOCK_SIZE);
 
         // Free the block and cipher_block memory
@@ -511,10 +582,16 @@ void encrypt(const uint8_t *plaintext, const uint8_t *key, uint8_t **ciphertext,
     free(padded_plaintext);
 }
 
-// Decrypt Function, receives the ciphertext, the key and a pointer to the plaintext
-void decrypt(const uint8_t *ciphertext, const size_t ciphertext_size,const uint8_t *key, uint8_t **plaintext, size_t *plaintext_size)
+/**
+ * Decrypt Function, receives the ciphertext, the key and a pointer to the plaintext
+ * 
+ * @param ciphertext the ciphertext (uint8_t array)
+ * @param key the key (uint8_t array)
+ * @param plaintext pointer to the plaintext (uint8_t array)
+ * @param plaintext_size pointer to the plaintext size (size_t)
+*/
+void decrypt(const uint8_t *ciphertext, const size_t ciphertext_size, const uint8_t *key, uint8_t **plaintext, size_t *plaintext_size)
 {
-    // 1. Generate the sboxes by the key
     struct s_box *sboxes = malloc(sizeof(struct s_box) * NUMBER_OF_ROUNDS);
 
     if (sboxes == NULL) // memory allocation error
@@ -525,29 +602,29 @@ void decrypt(const uint8_t *ciphertext, const size_t ciphertext_size,const uint8
 
     generate_sboxes(key, sboxes);
 
-    // Initialize the padded plaintext
-    size_t padded_plaintext_size = ciphertext_size; // Padded plaintext size is the same as ciphertext size
+    size_t padded_plaintext_size = ciphertext_size;
     uint8_t *padded_plaintext = malloc(padded_plaintext_size);
 
-    // 2. For each block run the feistel network and save the block result in the plaintext
+    if (padded_plaintext == NULL) // memory allocation error
+    {
+        printf("Error allocating memory for padded plaintext\n");
+        exit(1);
+    }
+
     for (size_t block_index = 0; block_index < ciphertext_size; block_index += BLOCK_SIZE)
     {
         uint8_t *block = malloc(BLOCK_SIZE);
         memcpy(block, ciphertext + block_index, BLOCK_SIZE);
 
-        // 2.1. Run the inverse feistel network
         uint8_t *decipher_block = malloc(BLOCK_SIZE);
         inverse_feistel_network(block, sboxes, &decipher_block);
 
-        // 2.2. Save the block result in the padded plaintext
         memcpy(padded_plaintext + block_index, decipher_block, BLOCK_SIZE);
 
-        // Free the block and decipher_block memory
         free(block);
         free(decipher_block);
     }
-    
-    // 3. Remove Padding
+
     remove_padding(padded_plaintext, padded_plaintext_size, plaintext, plaintext_size);
 
     // Free memory
@@ -555,6 +632,14 @@ void decrypt(const uint8_t *ciphertext, const size_t ciphertext_size,const uint8
     free(padded_plaintext);
 }
 
+/**
+ * Main function
+ * 
+ * @param argc number of arguments
+ * @param argv arguments
+ * 
+ * @return 0 if the program runs without errors, 1 otherwise
+*/
 int main(int argc, char **argv)
 {
 
@@ -568,7 +653,7 @@ int main(int argc, char **argv)
 
     uint8_t *decrypted_plaintext;
     size_t decrypted_plaintext_size;
-    decrypt(ciphertext, ciphertext_size ,NULL, &decrypted_plaintext, &decrypted_plaintext_size); // SUPOSSING THAT WE KNOW THE SIZE OF THE CIPHERTEXT
+    decrypt(ciphertext, ciphertext_size, NULL, &decrypted_plaintext, &decrypted_plaintext_size); // SUPOSSING THAT WE KNOW THE SIZE OF THE CIPHERTEXT
 
     printf("Decrypted plaintext: ");
     for (size_t i = 0; i < decrypted_plaintext_size; i++)
@@ -578,7 +663,6 @@ int main(int argc, char **argv)
     printf("\n");
 
     printf("Decrypted plaintext: %s\n", decrypted_plaintext);
-
 
     return 0;
 }
