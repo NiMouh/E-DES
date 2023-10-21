@@ -503,11 +503,11 @@ void generate_sboxes(const uint8_t *key, struct s_box *sboxes)
         generate_random_bytes(key, random_bytes, S_BOX_SIZE * NUMBER_OF_ROUNDS);
 
         // Copy the random bytes to the sboxes
-        for (int i = 0; i < NUMBER_OF_ROUNDS; i++)
+        for (int sbox_index = 0; sbox_index < NUMBER_OF_ROUNDS; sbox_index++)
         {
-            for (int j = 0; j < S_BOX_SIZE; j++)
+            for (int item_index = 0; item_index < S_BOX_SIZE; item_index++)
             {
-                sboxes[i].sbox[j] = random_bytes[i * S_BOX_SIZE + j];
+                sboxes[sbox_index].sbox[item_index] = random_bytes[sbox_index * S_BOX_SIZE + item_index];
             }
         }
 
@@ -517,11 +517,11 @@ void generate_sboxes(const uint8_t *key, struct s_box *sboxes)
 
     if (key == NULL) // if it's null add the global declared s_boxes
     {
-        for (int i = 0; i < NUMBER_OF_ROUNDS; i++)
+        for (int sbox_index = 0; sbox_index < NUMBER_OF_ROUNDS; sbox_index++)
         {
-            for (int j = 0; j < S_BOX_SIZE; j++)
+            for (int item_index = 0; item_index < S_BOX_SIZE; item_index++)
             {
-                sboxes[i].sbox[j] = s_boxes[i][j];
+                sboxes[sbox_index].sbox[item_index] = s_boxes[sbox_index][item_index];
             }
         }
     }
