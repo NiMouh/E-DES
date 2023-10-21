@@ -3,6 +3,7 @@
 #include <string.h>
 #include <stdint.h>
 #include <unistd.h>
+#include <openssl/sha.h>
 #define KEY_SIZE 32  // 256 bits
 #define BLOCK_SIZE 8 // 64 bits
 #define HALF_BLOCK_SIZE 4
@@ -446,6 +447,47 @@ void inverse_feistel_network(const uint8_t *block, const struct s_box *sboxes, u
 }
 
 /**
+ * Function that generates the key by the password, using SHA256
+ * 
+ * @param password the password (uint8_t array)
+ * @param key pointer to the key (uint8_t array)
+*/
+void generate_key(const uint8_t *password, uint8_t **key)
+{
+    SHA256_CTX ctx;
+    SHA256_Init(&ctx);
+    SHA256_Update(&ctx, password, strlen((char *)password));
+    SHA256_Final(*key, &ctx);
+}
+
+/**
+ * Function that generates the random bytes by the key
+ * 
+ * @param key the key (uint8_t array)
+ * @param bytes pointer to the random bytes (uint8_t array)
+*/
+void generate_random_bytes(const uint8_t *key, uint8_t *bytes, int num_bytes)
+{
+    // Initialize the pseudo-random number generator with the key
+    srand(*(unsigned int *)key);
+
+    // Initialize an array to keep track of how many times each byte has been used
+    int byteCount[256] = {0};
+
+    for (int index = 0; index < num_bytes; index++)
+    {
+        // Find a byte value that has not been used 16 times
+        uint8_t randomByte;
+        do {
+            randomByte = rand() & 0xFF; // Generate a random byte
+        } while (byteCount[randomByte] >= NUMBER_OF_S_BOXES);
+
+        bytes[index] = randomByte;
+        byteCount[randomByte]++;
+    }
+}
+
+/**
  * Function that generates the sboxes by the key
  * 
  * @param key the key (uint8_t array)
@@ -454,6 +496,24 @@ void inverse_feistel_network(const uint8_t *block, const struct s_box *sboxes, u
 void generate_sboxes(const uint8_t *key, struct s_box *sboxes)
 {
     // TODO: Generate the sboxes by the key
+    if (key != NULL)
+    {
+        // Generate the random bytes
+        uint8_t *random_bytes = malloc(S_BOX_SIZE * NUMBER_OF_ROUNDS);
+        generate_random_bytes(key, random_bytes, S_BOX_SIZE * NUMBER_OF_ROUNDS);
+
+        // Copy the random bytes to the sboxes
+        for (int i = 0; i < NUMBER_OF_ROUNDS; i++)
+        {
+            for (int j = 0; j < S_BOX_SIZE; j++)
+            {
+                sboxes[i].sbox[j] = random_bytes[i * S_BOX_SIZE + j];
+            }
+        }
+
+        free(random_bytes);
+    }
+    
 
     if (key == NULL) // if it's null add the global declared s_boxes
     {
@@ -526,14 +586,14 @@ void remove_padding(const uint8_t *padded_plaintext, size_t padded_length, uint8
 }
 
 /**
- * Encrypt Function, receives the plaintext, the key and a pointer to the ciphertext
+ * Encrypt Function, receives the plaintext, the password and a pointer to the ciphertext
  * 
  * @param plaintext the plaintext (uint8_t array)
- * @param key the key (uint8_t array)
+ * @param password the password (uint8_t array)
  * @param ciphertext pointer to the ciphertext (uint8_t array)
  * @param ciphertext_size pointer to the ciphertext size (size_t)
 */
-void encrypt(const uint8_t *plaintext, const uint8_t *key, uint8_t **ciphertext, size_t *ciphertext_size)
+void encrypt(const uint8_t *plaintext, const uint8_t *password, uint8_t **ciphertext, size_t *ciphertext_size)
 {
     size_t plaintext_size = strlen((char *)plaintext);
 
@@ -548,6 +608,16 @@ void encrypt(const uint8_t *plaintext, const uint8_t *key, uint8_t **ciphertext,
         printf("Error allocating memory for sboxes\n");
         exit(1);
     }
+
+    uint8_t *key = malloc(KEY_SIZE);
+
+    if (key == NULL) // memory allocation error
+    {
+        printf("Error allocating memory for key\n");
+        exit(1);
+    }
+
+    generate_key(password, &key);
 
     generate_sboxes(key, sboxes);
 
@@ -586,11 +656,11 @@ void encrypt(const uint8_t *plaintext, const uint8_t *key, uint8_t **ciphertext,
  * Decrypt Function, receives the ciphertext, the key and a pointer to the plaintext
  * 
  * @param ciphertext the ciphertext (uint8_t array)
- * @param key the key (uint8_t array)
+ * @param password the password (uint8_t array)
  * @param plaintext pointer to the plaintext (uint8_t array)
  * @param plaintext_size pointer to the plaintext size (size_t)
 */
-void decrypt(const uint8_t *ciphertext, const size_t ciphertext_size, const uint8_t *key, uint8_t **plaintext, size_t *plaintext_size)
+void decrypt(const uint8_t *ciphertext, const size_t ciphertext_size, const uint8_t *password, uint8_t **plaintext, size_t *plaintext_size)
 {
     struct s_box *sboxes = malloc(sizeof(struct s_box) * NUMBER_OF_ROUNDS);
 
@@ -599,6 +669,16 @@ void decrypt(const uint8_t *ciphertext, const size_t ciphertext_size, const uint
         printf("Error allocating memory for sboxes\n");
         exit(1);
     }
+
+    uint8_t *key = malloc(KEY_SIZE);
+
+    if (key == NULL) // memory allocation error
+    {
+        printf("Error allocating memory for key\n");
+        exit(1);
+    }
+
+    generate_key(password, &key);
 
     generate_sboxes(key, sboxes);
 
@@ -642,18 +722,18 @@ void decrypt(const uint8_t *ciphertext, const size_t ciphertext_size, const uint
 */
 int main(int argc, char **argv)
 {
-
     uint8_t plaintext[] = "testeeee";
+    uint8_t password[] = "password";
 
     uint8_t *ciphertext;
     size_t ciphertext_size;
-    encrypt(plaintext, NULL, &ciphertext, &ciphertext_size);
+    encrypt(plaintext, password, &ciphertext, &ciphertext_size);
 
     printf("Ciphertext: %s\n", ciphertext);
 
     uint8_t *decrypted_plaintext;
     size_t decrypted_plaintext_size;
-    decrypt(ciphertext, ciphertext_size, NULL, &decrypted_plaintext, &decrypted_plaintext_size); // SUPOSSING THAT WE KNOW THE SIZE OF THE CIPHERTEXT
+    decrypt(ciphertext, ciphertext_size, password, &decrypted_plaintext, &decrypted_plaintext_size); // SUPOSSING THAT WE KNOW THE SIZE OF THE CIPHERTEXT
 
     printf("Decrypted plaintext: ");
     for (size_t i = 0; i < decrypted_plaintext_size; i++)
