@@ -4,6 +4,7 @@
 #include <stdint.h>
 #include <unistd.h>
 #include <openssl/sha.h>
+#define MAX_BYTES 1024
 #define KEY_SIZE 32  // 256 bits
 #define BLOCK_SIZE 8 // 64 bits
 #define HALF_BLOCK_SIZE 4
@@ -289,9 +290,9 @@ uint8_t *s_boxes[16] = {SBox_01, SBox_02, SBox_03, SBox_04, SBox_05, SBox_06, SB
 
 /**
  * Struct that represents a sbox
- * 
+ *
  * @param sbox the sbox (uint8_t array)
-*/
+ */
 struct s_box
 {
     uint8_t sbox[S_BOX_SIZE];
@@ -299,10 +300,10 @@ struct s_box
 
 /**
  * Function that reads the bytes from stdin, it receives a pointer to the uint8_t array and a pointer to the size of the array
- * 
+ *
  * @param readed_bytes pointer to the uint8_t array
  * @param number_of_readed_bytes pointer to the size of the array (size_t)
-*/
+ */
 void read_bytes(uint8_t *readed_bytes, size_t *number_of_readed_bytes)
 {
     uint8_t byte;
@@ -318,10 +319,10 @@ void read_bytes(uint8_t *readed_bytes, size_t *number_of_readed_bytes)
 
 /**
  * Function that writes the bytes to stdout, it receives a pointer to the uint8_t array and the number of bytes to write
- * 
+ *
  * @param bytes_to_write pointer to the uint8_t array
  * @param number_of_bytes_to_write number of bytes to write (size_t)
-*/
+ */
 void write_bytes(const uint8_t *bytes_to_write, const size_t number_of_bytes_to_write)
 {
     for (int byte_writed = 0; byte_writed < number_of_bytes_to_write; byte_writed++)
@@ -332,13 +333,13 @@ void write_bytes(const uint8_t *bytes_to_write, const size_t number_of_bytes_to_
 
 /**
  * Function that does the feistel function operation, it receives the input block and the sbox
- * 
+ *
  * @param input_block the input block (uint8_t array)
  * @param s_box the sbox (uint8_t array)
- * 
+ *
  * @return the output block (uint8_t array)
- * 
-*/
+ *
+ */
 uint8_t *feistel_function(const uint8_t *input_block, const uint8_t *s_box)
 {
     uint8_t *output_block = malloc(HALF_BLOCK_SIZE);
@@ -360,11 +361,11 @@ uint8_t *feistel_function(const uint8_t *input_block, const uint8_t *s_box)
 
 /**
  * Function that handles the feistel network used to cipher, it receives the block that will be divided in two halfs, the sboxes and a pointer to the cipher block
- * 
+ *
  * @param block the block (uint8_t array)
  * @param sboxes the sboxes (struct s_box array)
  * @param cipher_block pointer of the cipher block pointer (uint8_t array)
-*/
+ */
 void feistel_network(const uint8_t *block, const struct s_box *sboxes, uint8_t **cipher_block)
 {
     uint8_t *L = (uint8_t *)malloc(HALF_BLOCK_SIZE);
@@ -404,11 +405,11 @@ void feistel_network(const uint8_t *block, const struct s_box *sboxes, uint8_t *
 
 /**
  * Function that handles the inverse feistel network used to decipher, it receives the block that will be divided in two halfs, the sboxes and a pointer to the cipher block
- * 
+ *
  * @param block the block (uint8_t array)
  * @param sboxes the sboxes (struct s_box array)
  * @param cipher_block pointer of the cipher block pointer (uint8_t array)
-*/
+ */
 void inverse_feistel_network(const uint8_t *block, const struct s_box *sboxes, uint8_t **cipher_block)
 {
     uint8_t *L = malloc(HALF_BLOCK_SIZE);
@@ -448,10 +449,10 @@ void inverse_feistel_network(const uint8_t *block, const struct s_box *sboxes, u
 
 /**
  * Function that generates the key by the password, using SHA256
- * 
+ *
  * @param password the password (uint8_t array)
  * @param key pointer to the key (uint8_t array)
-*/
+ */
 void generate_key(const uint8_t *password, uint8_t **key)
 {
     SHA256_CTX ctx;
@@ -462,10 +463,10 @@ void generate_key(const uint8_t *password, uint8_t **key)
 
 /**
  * Function that generates the random bytes by the key
- * 
+ *
  * @param key the key (uint8_t array)
  * @param bytes pointer to the random bytes (uint8_t array)
-*/
+ */
 void generate_random_bytes(const uint8_t *key, uint8_t *bytes, int num_bytes)
 {
     // Initialize the pseudo-random number generator with the key
@@ -478,7 +479,8 @@ void generate_random_bytes(const uint8_t *key, uint8_t *bytes, int num_bytes)
     {
         // Find a byte value that has not been used 16 times
         uint8_t randomByte;
-        do {
+        do
+        {
             randomByte = rand() & 0xFF; // Generate a random byte
         } while (byteCount[randomByte] >= NUMBER_OF_S_BOXES);
 
@@ -489,10 +491,10 @@ void generate_random_bytes(const uint8_t *key, uint8_t *bytes, int num_bytes)
 
 /**
  * Function that generates the sboxes by the key
- * 
+ *
  * @param key the key (uint8_t array)
  * @param sboxes pointer to the sboxes (struct s_box array)
-*/
+ */
 void generate_sboxes(const uint8_t *key, struct s_box *sboxes)
 {
     // TODO: Generate the sboxes by the key
@@ -513,7 +515,6 @@ void generate_sboxes(const uint8_t *key, struct s_box *sboxes)
 
         free(random_bytes);
     }
-    
 
     if (key == NULL) // if it's null add the global declared s_boxes
     {
@@ -529,12 +530,12 @@ void generate_sboxes(const uint8_t *key, struct s_box *sboxes)
 
 /**
  * Function that will apply the PCKS#7 padding to the plaintext, it receives the plaintext, the plaintext length, a pointer to the padded plaintext and a pointer to the padded length
- * 
+ *
  * @param plaintext the plaintext (uint8_t array)
  * @param plaintext_length the plaintext length (size_t)
  * @param padded_plaintext pointer to the padded plaintext (uint8_t array)
  * @param padded_length pointer to the padded length (size_t)
-*/
+ */
 void add_padding(const uint8_t *plaintext, size_t plaintext_length, uint8_t **padded_plaintext, size_t *padded_length)
 {
     // Calculate the new padded length
@@ -562,12 +563,12 @@ void add_padding(const uint8_t *plaintext, size_t plaintext_length, uint8_t **pa
 
 /**
  * Function that will remove the PCKS#7 padding from the padded plaintext, it receives the padded plaintext, the padded plaintext length, a pointer to the plaintext and a pointer to the plaintext length
- * 
+ *
  * @param padded_plaintext the padded plaintext (uint8_t array)
  * @param padded_length the padded plaintext length (size_t)
  * @param plaintext pointer to the plaintext (uint8_t array)
  * @param plaintext_length pointer to the plaintext length (size_t)
-*/
+ */
 void remove_padding(const uint8_t *padded_plaintext, size_t padded_length, uint8_t **plaintext, size_t *plaintext_length)
 {
     size_t padding_bytes = padded_plaintext[padded_length - 1] - '0';
@@ -576,7 +577,7 @@ void remove_padding(const uint8_t *padded_plaintext, size_t padded_length, uint8
     *plaintext = (uint8_t *)malloc(*plaintext_length);
 
     if (*plaintext == NULL) // memory allocation error
-    { 
+    {
         fprintf(stderr, "Error allocating memory for plaintext\n");
         exit(1);
     }
@@ -587,12 +588,12 @@ void remove_padding(const uint8_t *padded_plaintext, size_t padded_length, uint8
 
 /**
  * Encrypt Function, receives the plaintext, the password and a pointer to the ciphertext
- * 
+ *
  * @param plaintext the plaintext (uint8_t array)
  * @param password the password (uint8_t array)
  * @param ciphertext pointer to the ciphertext (uint8_t array)
  * @param ciphertext_size pointer to the ciphertext size (size_t)
-*/
+ */
 void encrypt(const uint8_t *plaintext, const uint8_t *password, uint8_t **ciphertext, size_t *ciphertext_size)
 {
     size_t plaintext_size = strlen((char *)plaintext);
@@ -654,12 +655,12 @@ void encrypt(const uint8_t *plaintext, const uint8_t *password, uint8_t **cipher
 
 /**
  * Decrypt Function, receives the ciphertext, the key and a pointer to the plaintext
- * 
+ *
  * @param ciphertext the ciphertext (uint8_t array)
  * @param password the password (uint8_t array)
  * @param plaintext pointer to the plaintext (uint8_t array)
  * @param plaintext_size pointer to the plaintext size (size_t)
-*/
+ */
 void decrypt(const uint8_t *ciphertext, const size_t ciphertext_size, const uint8_t *password, uint8_t **plaintext, size_t *plaintext_size)
 {
     struct s_box *sboxes = malloc(sizeof(struct s_box) * NUMBER_OF_ROUNDS);
@@ -713,36 +714,64 @@ void decrypt(const uint8_t *ciphertext, const size_t ciphertext_size, const uint
 }
 
 /**
- * Main function
- * 
+ * Main function, it receives the arguments and calls the encrypt or decrypt function
+ *
  * @param argc number of arguments
  * @param argv arguments
- * 
+ *
  * @return 0 if the program runs without errors, 1 otherwise
-*/
+ */
 int main(int argc, char **argv)
 {
-    uint8_t plaintext[] = "testeeee";
-    uint8_t password[] = "password";
-
-    uint8_t *ciphertext;
-    size_t ciphertext_size;
-    encrypt(plaintext, password, &ciphertext, &ciphertext_size);
-
-    printf("Ciphertext: %s\n", ciphertext);
-
-    uint8_t *decrypted_plaintext;
-    size_t decrypted_plaintext_size;
-    decrypt(ciphertext, ciphertext_size, password, &decrypted_plaintext, &decrypted_plaintext_size); // SUPOSSING THAT WE KNOW THE SIZE OF THE CIPHERTEXT
-
-    printf("Decrypted plaintext: ");
-    for (size_t i = 0; i < decrypted_plaintext_size; i++)
+    if (argc != 3)
     {
-        printf("%02x ", decrypted_plaintext[i]);
+        fprintf(stderr, "Usage: %s <-e/-d> <password>\n", argv[0]);
+        exit(1);
     }
-    printf("\n");
 
-    printf("Decrypted plaintext: %s\n", decrypted_plaintext);
+    // Read the password
+    uint8_t *password = (uint8_t *)argv[2];
+
+    // Read the bytes from stdin
+    uint8_t *readed_bytes = malloc(sizeof(uint8_t) * MAX_BYTES);
+
+    if (readed_bytes == NULL) // memory allocation error
+    {
+        printf("Error allocating memory for readed bytes\n");
+        exit(1);
+    }
+
+    size_t number_of_readed_bytes;
+    read_bytes(readed_bytes, &number_of_readed_bytes);
+
+    // Encrypt or decrypt
+    int cipher = strcmp(argv[1], "-e") == 0;
+    if (cipher)
+    {
+        // Encrypt
+        uint8_t *ciphertext;
+        size_t ciphertext_size;
+        encrypt(readed_bytes, password, &ciphertext, &ciphertext_size);
+
+        // Write the ciphertext to stdout
+        write_bytes(ciphertext, ciphertext_size);
+
+        // Free memory
+        free(ciphertext);
+    }
+    else
+    {
+        // Decrypt
+        uint8_t *plaintext;
+        size_t plaintext_size;
+        decrypt(readed_bytes, number_of_readed_bytes, password, &plaintext, &plaintext_size);
+
+        // Write the plaintext to stdout
+        write_bytes(plaintext, plaintext_size);
+
+        // Free memory
+        free(plaintext);
+    }
 
     return 0;
 }
