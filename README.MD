@@ -8,27 +8,37 @@
  - O E-DES (ou DES) deve ser utilizado para processar a entrada no modo ECB com um *padding* PKCS#7.
 
 ## Compilar e Executar
-Para **compilar** o projeto em C, basta executar o seguinte comando:
+Para **compilar** o projeto em C, basta executar o makefile:
 ```console
-$ cc -o des des.c -lcrypto
+$ make
+```
+
+Para **limpar** os ficheiros gerados pelo makefile, basta executar o seguinte comando:
+```console
+$ make clean
 ```
 
 Para **cifrar**, basta executar o seguinte comando:
 ```console
-$ ./des -e <chave> <ficheiro de entrada> <ficheiro de saída>
+$ ./des -e <palavra-passe>
 ```
+
+Depois é só usar o `stdin` para inserir o texto a cifrar e o `stdout` para obter o texto cifrado.
+
 
 Para **decifrar**, basta executar o seguinte comando:
 ```console
-$ ./des -d <chave> <ficheiro de entrada> <ficheiro de saída>
+$ ./des -d <palavra-passe>
 ```
 
-## Tamanhos
-- Bloco: `64 bits` (8 bytes)
-- Chave de cifra: `256 bits` (32 bytes)
-- Rondas: `16`
-- S-Boxes: `16`
-- tamanho da S-Box: `256` bytes
+Depois é só usar o `stdin` para inserir o texto a decifrar e o `stdout` para obter o texto decifrado.
+
+## Medidas
+- Tamanho do Bloco: `64 bits` (8 bytes)
+- Chave de gerada pela palavra-passe: `256 bits` (32 bytes)
+- Número Rondas: `16`
+- Número S-Boxes: `16`
+- Tamanho da S-Box: `256` bytes
 
 ## Feistel Network
 A rede Feistel é uma rede de permutação de dados que é utilizada em criptografia.
