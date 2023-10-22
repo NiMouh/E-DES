@@ -23,7 +23,7 @@ void write_bytes(const uint8_t *bytes_to_write, const size_t number_of_bytes_to_
 
 uint8_t *feistel_function(const uint8_t *input_block, const uint8_t *s_box)
 {
-    uint8_t *output_block = malloc(HALF_BLOCK_SIZE);
+    uint8_t *output_block = (uint8_t *) malloc(HALF_BLOCK_SIZE);
 
     uint8_t index = input_block[3];
     output_block[0] = s_box[index];
@@ -79,8 +79,8 @@ void feistel_network(const uint8_t *block, const struct s_box *sboxes, uint8_t *
 
 void inverse_feistel_network(const uint8_t *block, const struct s_box *sboxes, uint8_t **cipher_block)
 {
-    uint8_t *L = malloc(HALF_BLOCK_SIZE);
-    uint8_t *R = malloc(HALF_BLOCK_SIZE);
+    uint8_t *L = (uint8_t *) malloc(HALF_BLOCK_SIZE);
+    uint8_t *R = (uint8_t *) malloc(HALF_BLOCK_SIZE);
 
     if (L == NULL || R == NULL) // memory allocation error
     {
@@ -92,7 +92,7 @@ void inverse_feistel_network(const uint8_t *block, const struct s_box *sboxes, u
     memcpy(L, block, HALF_BLOCK_SIZE);
     memcpy(R, block + HALF_BLOCK_SIZE, HALF_BLOCK_SIZE);
 
-    uint8_t *M = malloc(HALF_BLOCK_SIZE);
+    uint8_t *M = (uint8_t *) malloc(HALF_BLOCK_SIZE);
     for (int round = NUMBER_OF_ROUNDS - 1; round >= 0; round--)
     {
         // Copy the left to a temporary variable
@@ -149,7 +149,7 @@ void generate_sboxes(const uint8_t *key, struct s_box *sboxes)
     if (key != NULL)
     {
         // Generate the random bytes
-        uint8_t *random_bytes = malloc(S_BOX_SIZE * NUMBER_OF_ROUNDS);
+        uint8_t *random_bytes = (uint8_t *) malloc(S_BOX_SIZE * NUMBER_OF_ROUNDS);
         generate_random_bytes(key, random_bytes, S_BOX_SIZE * NUMBER_OF_ROUNDS);
 
         // Copy the random bytes to the sboxes

@@ -16,7 +16,7 @@ void encrypt(const uint8_t *plaintext, const uint8_t *password, uint8_t **cipher
     size_t padded_plaintext_size;
     add_padding(plaintext, plaintext_size, &padded_plaintext, &padded_plaintext_size);
 
-    struct s_box *sboxes = malloc(sizeof(struct s_box) * NUMBER_OF_ROUNDS);
+    struct s_box *sboxes = (struct s_box *)malloc(sizeof(struct s_box) * NUMBER_OF_ROUNDS);
 
     if (sboxes == NULL) // memory allocation error
     {
@@ -24,7 +24,7 @@ void encrypt(const uint8_t *plaintext, const uint8_t *password, uint8_t **cipher
         exit(1);
     }
 
-    uint8_t *key = malloc(KEY_SIZE);
+    uint8_t *key = (uint8_t *) malloc(KEY_SIZE);
 
     if (key == NULL) // memory allocation error
     {
@@ -46,10 +46,10 @@ void encrypt(const uint8_t *plaintext, const uint8_t *password, uint8_t **cipher
 
     for (size_t block_index = 0; block_index < padded_plaintext_size; block_index += BLOCK_SIZE)
     {
-        uint8_t *block = malloc(BLOCK_SIZE);
+        uint8_t *block = (uint8_t *)malloc(BLOCK_SIZE);
         memcpy(block, padded_plaintext + block_index, BLOCK_SIZE);
 
-        uint8_t *cipher_block = malloc(BLOCK_SIZE);
+        uint8_t *cipher_block = (uint8_t *)malloc(BLOCK_SIZE);
         feistel_network(block, sboxes, &cipher_block);
 
         memcpy(*ciphertext + block_index, cipher_block, BLOCK_SIZE);
@@ -77,7 +77,7 @@ void encrypt(const uint8_t *plaintext, const uint8_t *password, uint8_t **cipher
  */
 void decrypt(const uint8_t *ciphertext, const size_t ciphertext_size, const uint8_t *password, uint8_t **plaintext, size_t *plaintext_size)
 {
-    struct s_box *sboxes = malloc(sizeof(struct s_box) * NUMBER_OF_ROUNDS);
+    struct s_box *sboxes = (struct s_box *)malloc(sizeof(struct s_box) * NUMBER_OF_ROUNDS);
 
     if (sboxes == NULL) // memory allocation error
     {
@@ -85,7 +85,7 @@ void decrypt(const uint8_t *ciphertext, const size_t ciphertext_size, const uint
         exit(1);
     }
 
-    uint8_t *key = malloc(KEY_SIZE);
+    uint8_t *key = (uint8_t *) malloc(KEY_SIZE);
 
     if (key == NULL) // memory allocation error
     {
@@ -98,7 +98,7 @@ void decrypt(const uint8_t *ciphertext, const size_t ciphertext_size, const uint
     generate_sboxes(key, sboxes);
 
     size_t padded_plaintext_size = ciphertext_size;
-    uint8_t *padded_plaintext = malloc(padded_plaintext_size);
+    uint8_t *padded_plaintext = (uint8_t *) malloc(padded_plaintext_size);
 
     if (padded_plaintext == NULL) // memory allocation error
     {
@@ -108,10 +108,10 @@ void decrypt(const uint8_t *ciphertext, const size_t ciphertext_size, const uint
 
     for (size_t block_index = 0; block_index < ciphertext_size; block_index += BLOCK_SIZE)
     {
-        uint8_t *block = malloc(BLOCK_SIZE);
+        uint8_t *block = (uint8_t *) malloc(BLOCK_SIZE);
         memcpy(block, ciphertext + block_index, BLOCK_SIZE);
 
-        uint8_t *decipher_block = malloc(BLOCK_SIZE);
+        uint8_t *decipher_block = (uint8_t *) malloc(BLOCK_SIZE);
         inverse_feistel_network(block, sboxes, &decipher_block);
 
         memcpy(padded_plaintext + block_index, decipher_block, BLOCK_SIZE);
@@ -147,7 +147,7 @@ int main(int argc, char **argv)
     uint8_t *password = (uint8_t *)argv[2];
 
     // Read the bytes from stdin
-    uint8_t *readed_bytes = malloc(sizeof(uint8_t) * MAX_BYTES);
+    uint8_t *readed_bytes = (uint8_t *) malloc(sizeof(uint8_t) * MAX_BYTES);
 
     if (readed_bytes == NULL) // memory allocation error
     {

@@ -1,4 +1,5 @@
-#define IMPLEMENTATION_H
+#ifndef __IMPLEMENTATION_H__
+#define __IMPLEMENTATION_H__
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -113,3 +114,5 @@ void add_padding(const uint8_t *plaintext, size_t plaintext_length, uint8_t **pa
  * @param plaintext_length pointer to the plaintext length (size_t)
  */
 void remove_padding(const uint8_t *padded_plaintext, size_t padded_length, uint8_t **plaintext, size_t *plaintext_length);
+
+#endif

@@ -1,25 +1,20 @@
-CC = gcc
-CFLAGS = -std=c99 -Wall -Wextra
-LDFLAGS = -lssl -lcrypto
+GXX = g++
+LDFLAGS = -lcrypto
+TARGETS = e-des e-des-cpp
+OBJECTS = implementation.o
 
-TARGET = e-des e-des-cpp
+all: $(TARGETS)
 
-OBJS = e-des.o implementation.o
+e-des: e-des.c $(OBJECTS)
+	$(GXX) -o $@ $^ $(LDFLAGS)
 
-TEST_FILES = *.txt
-
-all: $(TARGET)
-
-$(TARGET): $(OBJS)
-	$(CC) -o $@ $^ $(LDFLAGS)
+e-des-cpp: e-des-cpp.cpp $(OBJECTS)
+	$(GXX) -o $@ $^ $(LDFLAGS)
 
 %.o: %.c
-	$(CC) $(CFLAGS) -c $<
-
-implementation.o: implementation.c
-	$(CC) $(CFLAGS) -c $<
+	$(GXX) -c $<
 
 clean:
-	rm -f $(TARGET) $(OBJS) $(TEST_FILES)
+	rm -f $(TARGETS) $(OBJECTS)
 
 .PHONY: all clean
