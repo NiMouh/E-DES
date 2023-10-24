@@ -23,7 +23,7 @@ void write_bytes(const uint8_t *bytes_to_write, const size_t number_of_bytes_to_
 
 uint8_t *feistel_function(const uint8_t *input_block, const uint8_t *s_box)
 {
-    uint8_t *output_block = (uint8_t *) malloc(HALF_BLOCK_SIZE);
+    uint8_t *output_block = (uint8_t *)malloc(HALF_BLOCK_SIZE);
 
     uint8_t index = input_block[3];
     output_block[0] = s_box[index];
@@ -79,8 +79,8 @@ void feistel_network(const uint8_t *block, const struct s_box *sboxes, uint8_t *
 
 void inverse_feistel_network(const uint8_t *block, const struct s_box *sboxes, uint8_t **cipher_block)
 {
-    uint8_t *L = (uint8_t *) malloc(HALF_BLOCK_SIZE);
-    uint8_t *R = (uint8_t *) malloc(HALF_BLOCK_SIZE);
+    uint8_t *L = (uint8_t *)malloc(HALF_BLOCK_SIZE);
+    uint8_t *R = (uint8_t *)malloc(HALF_BLOCK_SIZE);
 
     if (L == NULL || R == NULL) // memory allocation error
     {
@@ -92,7 +92,7 @@ void inverse_feistel_network(const uint8_t *block, const struct s_box *sboxes, u
     memcpy(L, block, HALF_BLOCK_SIZE);
     memcpy(R, block + HALF_BLOCK_SIZE, HALF_BLOCK_SIZE);
 
-    uint8_t *M = (uint8_t *) malloc(HALF_BLOCK_SIZE);
+    uint8_t *M = (uint8_t *)malloc(HALF_BLOCK_SIZE);
     for (int round = NUMBER_OF_ROUNDS - 1; round >= 0; round--)
     {
         // Copy the left to a temporary variable
@@ -149,7 +149,7 @@ void generate_sboxes(const uint8_t *key, struct s_box *sboxes)
     if (key != NULL)
     {
         // Generate the random bytes
-        uint8_t *random_bytes = (uint8_t *) malloc(S_BOX_SIZE * NUMBER_OF_ROUNDS);
+        uint8_t *random_bytes = (uint8_t *)malloc(S_BOX_SIZE * NUMBER_OF_ROUNDS);
         generate_random_bytes(key, random_bytes, S_BOX_SIZE * NUMBER_OF_ROUNDS);
 
         // Copy the random bytes to the sboxes
@@ -193,6 +193,12 @@ void add_padding(const uint8_t *plaintext, size_t plaintext_length, uint8_t **pa
 void remove_padding(const uint8_t *padded_plaintext, size_t padded_length, uint8_t **plaintext, size_t *plaintext_length)
 {
     size_t padding_bytes = padded_plaintext[padded_length - 1] - '0';
+
+    if (padding_bytes > BLOCK_SIZE)
+    {
+        padding_bytes = 0;
+    }
+
     *plaintext_length = padded_length - padding_bytes;
 
     *plaintext = (uint8_t *)malloc(*plaintext_length);
@@ -205,4 +211,184 @@ void remove_padding(const uint8_t *padded_plaintext, size_t padded_length, uint8
 
     // Copy the original plaintext including the null terminator
     memcpy(*plaintext, padded_plaintext, *plaintext_length);
+}
+
+void encrypt(const uint8_t *plaintext, const uint8_t *password, uint8_t **ciphertext, size_t *ciphertext_size)
+{
+    size_t plaintext_size = strlen((char *)plaintext);
+
+    uint8_t *padded_plaintext;
+    size_t padded_plaintext_size;
+    add_padding(plaintext, plaintext_size, &padded_plaintext, &padded_plaintext_size);
+
+    struct s_box *sboxes = (struct s_box *)malloc(sizeof(struct s_box) * NUMBER_OF_ROUNDS);
+
+    if (sboxes == NULL) // memory allocation error
+    {
+        printf("Error allocating memory for sboxes\n");
+        exit(1);
+    }
+
+    uint8_t *key = (uint8_t *)malloc(KEY_SIZE);
+
+    if (key == NULL) // memory allocation error
+    {
+        printf("Error allocating memory for key\n");
+        exit(1);
+    }
+
+    generate_key(password, &key);
+
+    generate_sboxes(key, sboxes);
+
+    *ciphertext = (uint8_t *)malloc(padded_plaintext_size);
+
+    if (*ciphertext == NULL) // Check for memory allocation error
+    {
+        printf("Error allocating memory for ciphertext\n");
+        exit(1);
+    }
+
+    for (size_t block_index = 0; block_index < padded_plaintext_size; block_index += BLOCK_SIZE)
+    {
+        uint8_t *block = (uint8_t *)malloc(BLOCK_SIZE);
+        memcpy(block, padded_plaintext + block_index, BLOCK_SIZE);
+
+        uint8_t *cipher_block = (uint8_t *)malloc(BLOCK_SIZE);
+        feistel_network(block, sboxes, &cipher_block);
+
+        memcpy(*ciphertext + block_index, cipher_block, BLOCK_SIZE);
+
+        // Free the block and cipher_block memory
+        free(block);
+        free(cipher_block);
+    }
+
+    // Update the ciphertext size
+    *ciphertext_size = padded_plaintext_size;
+
+    // Free memory
+    free(sboxes);
+    free(padded_plaintext);
+}
+
+void decrypt(const uint8_t *ciphertext, const size_t ciphertext_size, const uint8_t *password, uint8_t **plaintext, size_t *plaintext_size)
+{
+    struct s_box *sboxes = (struct s_box *)malloc(sizeof(struct s_box) * NUMBER_OF_ROUNDS);
+
+    if (sboxes == NULL) // memory allocation error
+    {
+        printf("Error allocating memory for sboxes\n");
+        exit(1);
+    }
+
+    uint8_t *key = (uint8_t *)malloc(KEY_SIZE);
+
+    if (key == NULL) // memory allocation error
+    {
+        printf("Error allocating memory for key\n");
+        exit(1);
+    }
+
+    generate_key(password, &key);
+
+    generate_sboxes(key, sboxes);
+
+    size_t padded_plaintext_size = ciphertext_size;
+    uint8_t *padded_plaintext = (uint8_t *)malloc(padded_plaintext_size);
+
+    if (padded_plaintext == NULL) // memory allocation error
+    {
+        printf("Error allocating memory for padded plaintext\n");
+        exit(1);
+    }
+
+    for (size_t block_index = 0; block_index < ciphertext_size; block_index += BLOCK_SIZE)
+    {
+        uint8_t *block = (uint8_t *)malloc(BLOCK_SIZE);
+        memcpy(block, ciphertext + block_index, BLOCK_SIZE);
+
+        uint8_t *decipher_block = (uint8_t *)malloc(BLOCK_SIZE);
+        inverse_feistel_network(block, sboxes, &decipher_block);
+
+        memcpy(padded_plaintext + block_index, decipher_block, BLOCK_SIZE);
+
+        free(block);
+        free(decipher_block);
+    }
+
+    remove_padding(padded_plaintext, padded_plaintext_size, plaintext, plaintext_size);
+
+    // Free memory
+    free(sboxes);
+    free(padded_plaintext);
+}
+
+void ecb_encrypt(const uint8_t *plaintext, const uint8_t *password, uint8_t **ciphertext)
+{
+    // Declare key schedule
+    DES_cblock des_key;
+    DES_key_schedule schedule;
+    memcpy(des_key, password, BLOCK_SIZE);
+
+    DES_set_odd_parity(&des_key);
+    DES_set_key_checked(&des_key, &schedule);
+
+    // Add padding
+    size_t plaintext_len = strlen((char *)plaintext);
+    size_t padded_len;
+    uint8_t *padded_plaintext;
+    add_padding(plaintext, plaintext_len, &padded_plaintext, &padded_len);
+
+    // Declare ciphertext
+    size_t ciphertext_len = padded_len;
+    *ciphertext = (uint8_t *)malloc(ciphertext_len);
+
+    if (*ciphertext == NULL) // memory allocation error
+    {
+        printf("Error allocating memory for ciphertext\n");
+        exit(1);
+    }
+
+    // Encrypt
+    for (size_t block_index = 0; block_index < padded_len; block_index += BLOCK_SIZE)
+    {
+        DES_ecb_encrypt((DES_cblock *)(padded_plaintext + block_index), (DES_cblock *)(*ciphertext + block_index), &schedule, DES_ENCRYPT);
+    }
+
+    free(padded_plaintext);
+
+}
+
+void ecb_decrypt(const uint8_t *ciphertext, const size_t ciphertext_size, const uint8_t *password, uint8_t **plaintext)
+{
+    // Declare key schedule
+    DES_cblock des_key;
+    DES_key_schedule schedule;
+    memcpy(des_key, password, BLOCK_SIZE);
+
+    DES_set_odd_parity(&des_key);
+    DES_set_key_checked(&des_key, &schedule);
+
+    // Declare plaintext
+    size_t padded_plaintext_len = ciphertext_size;
+    uint8_t *padded_plaintext = (uint8_t *)malloc(padded_plaintext_len);
+
+    if (padded_plaintext == NULL) // memory allocation error
+    {
+        printf("Error allocating memory for padded plaintext\n");
+        exit(1);
+    }
+
+    // Decrypt
+    for (size_t block_index = 0; block_index < ciphertext_size; block_index += BLOCK_SIZE)
+    {
+        DES_ecb_encrypt((DES_cblock *)(ciphertext + block_index), (DES_cblock *)(padded_plaintext + block_index), &schedule, DES_DECRYPT);
+    }
+
+    // Remove padding
+    size_t plaintext_len;
+    remove_padding(padded_plaintext, padded_plaintext_len, plaintext, &plaintext_len);
+
+    free(padded_plaintext);
 }

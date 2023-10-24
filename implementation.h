@@ -1,6 +1,7 @@
 #ifndef __IMPLEMENTATION_H__
 #define __IMPLEMENTATION_H__
 
+// Libraries for the implementation
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -8,6 +9,11 @@
 #include <stddef.h>
 #include <openssl/sha.h>
 
+// Libraries for performance testing
+#include <openssl/des.h>
+#include <time.h>
+
+// Constants for the implementation
 #define MAX_BYTES 1024
 #define KEY_SIZE 32  // 256 bits
 #define BLOCK_SIZE 8 // 64 bits
@@ -16,11 +22,15 @@
 #define NUMBER_OF_S_BOXES 16
 #define S_BOX_SIZE 256 // 256 bytes
 
+// Constants for the performance testing
+#define NUMBER_OF_TESTS 100000
+#define BUFFER_SIZE (4 * 1024)  // 4KiB buffer size
+
 /**
  * Struct that represents a sbox
- * 
+ *
  * @param sbox the sbox (uint8_t array)
-*/
+ */
 struct s_box
 {
     uint8_t sbox[S_BOX_SIZE];
@@ -114,5 +124,46 @@ void add_padding(const uint8_t *plaintext, size_t plaintext_length, uint8_t **pa
  * @param plaintext_length pointer to the plaintext length (size_t)
  */
 void remove_padding(const uint8_t *padded_plaintext, size_t padded_length, uint8_t **plaintext, size_t *plaintext_length);
+
+/**
+ * Encrypt Function, receives the plaintext, the password and a pointer to the ciphertext
+ *
+ * @param plaintext the plaintext (uint8_t array)
+ * @param password the password (uint8_t array)
+ * @param ciphertext pointer to the ciphertext (uint8_t array)
+ * @param ciphertext_size pointer to the ciphertext size (size_t)
+ */
+void encrypt(const uint8_t *plaintext, const uint8_t *password, uint8_t **ciphertext, size_t *ciphertext_size);
+
+/**
+ * Decrypt Function, receives the ciphertext, the key and a pointer to the plaintext
+ *
+ * @param ciphertext the ciphertext (uint8_t array)
+ * @param password the password (uint8_t array)
+ * @param plaintext pointer to the plaintext (uint8_t array)
+ * @param plaintext_size pointer to the plaintext size (size_t)
+ */
+void decrypt(const uint8_t *ciphertext, const size_t ciphertext_size, const uint8_t *password, uint8_t **plaintext, size_t *plaintext_size);
+
+/**
+ * ECB Encrypt Function, receives the plaintext, the password and a pointer to the ciphertext
+ *
+ * @param plaintext the plaintext (uint8_t array)
+ * @param password the password (uint8_t array)
+ * @param ciphertext pointer to the ciphertext (uint8_t array)
+ *
+ */
+void ecb_encrypt(const uint8_t *plaintext, const uint8_t *password, uint8_t **ciphertext);
+
+/**
+ * ECB Decrypt Function, receives the ciphertext, the password and a pointer to the plaintext
+ *
+ * @param ciphertext the ciphertext (uint8_t array)
+ * @param ciphertext_size the ciphertext size (size_t)
+ * @param password the password (uint8_t array)
+ * @param plaintext pointer to the plaintext (uint8_t array)
+ *
+ */
+void ecb_decrypt(const uint8_t *ciphertext, const size_t ciphertext_size, const uint8_t *password, uint8_t **plaintext);
 
 #endif

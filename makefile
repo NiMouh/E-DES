@@ -1,18 +1,18 @@
-GXX = g++
+CC = gcc
 LDFLAGS = -lcrypto
-TARGETS = e-des e-des-cpp
+TARGETS = e-des performance
 OBJECTS = implementation.o
 
 all: $(TARGETS)
 
 e-des: e-des.c $(OBJECTS)
-	$(GXX) -o $@ $^ $(LDFLAGS)
+	$(CC) -o $@ $^ $(LDFLAGS)
 
-e-des-cpp: e-des-cpp.cpp $(OBJECTS)
-	$(GXX) -o $@ $^ $(LDFLAGS)
+performance: performance.c $(OBJECTS)
+	$(CC) -o $@ $^ $(LDFLAGS)
 
 %.o: %.c
-	$(GXX) -c $<
+	$(CC) -c $<
 
 clean:
 	rm -f $(TARGETS) $(OBJECTS)
