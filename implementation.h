@@ -1,6 +1,17 @@
 #ifndef __IMPLEMENTATION_H__
 #define __IMPLEMENTATION_H__
 
+/**
+ * @file implementation.c
+ * @brief Implementation of the e-des and des-ecb modes
+ * 
+ * This file contains the modules to the implementation of the e-des and des-ecb modes (using the openssl library). 
+ *
+ * @author Ana Vidal (118408)
+ * @author Simão Andrade (118345)
+ * @date 2023-10-20
+ */
+
 // Libraries for the implementation
 #include <stdio.h>
 #include <stdlib.h>

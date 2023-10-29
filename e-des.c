@@ -4,8 +4,7 @@
  * @file e-des.c
  * @brief Implementation of the e-des and des-ecb modes
  * 
- * This file contains the main function and a link to the implementation.h file, with the implementation
- * of the e-des and des-ecb modes (using the openssl library).
+ * This file contains the main function where the program starts.
  *
  * @author Ana Vidal (118408)
  * @author Simão Andrade (118345)

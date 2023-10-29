@@ -3,11 +3,108 @@
 ## Objetivo
  - Este projeto é uma modificação do algoritmo DES. 
  - Esta variante utiliza menos operações do que o algoritmo DES original.
- - Utiliza apenas as redes Feistel e as S-Boxes para encriptar e desencriptar dados.
+ - Utiliza apenas as redes Feistel e as S-Boxes para a cifragem e decifragem dados.
  - As aplicações devem processar a entrada a partir de `stdin` e produzir um resultado para `stdout`. 
  - O E-DES (ou DES) deve ser utilizado para processar a entrada no modo ECB com um *padding* PKCS#7.
+ - A geração de S-Boxes é feita através de uma palavra-passe textual, implementação ao critério do grupo.
+ - Cada valor das S-Boxes existe 16 vezes, pode ser encontrados na mesma ou em S-Boxes diferentes.
 
-## Compilar e Executar
+## Implementação e Desenvolvimento
+Neste capítulo, irá ser abordado o processo de implementação e desenvolvimento do projeto de criptografia com base nas especificações detalhadas anteriormente. Abordaremos a tradução de conceitos teóricos em código prático, explicando como cada componente é efetivamente implementado
+
+### Especificações do Projeto
+- Tamanho do Bloco: `64 bits` (8 bytes).
+- Chave de gerada pela palavra-passe: `256 bits` (32 bytes).
+- Número Rondas: `16`.
+- Número S-Boxes: `16`.
+- Tamanho da S-Box: `256` bytes.
+
+### PKCS#7 *Padding*
+*Padding* é um processo usado em criptografia e processamento de dados para **ajustar o tamanho** de um bloco de dados, geralmente em formato binário, a um tamanho específico. Isso é necessário quando algoritmos criptográficos operam em blocos de **tamanho fixo**, e os dados de entrada não preenchem o bloco inteiramente. 
+
+O PKCS#7 é um esquema de preenchimento amplamente utilizado, funciona da seguinte forma:
+1. Se o tamanho do mensagem for múltiplo do tamanho do bloco, então é adicionado um bloco de bytes com o valor do tamanho do bloco.
+2. Se o tamanho do mensagem não for múltiplo do tamanho do bloco, então é adicionado um bloco de bytes com o valor da diferença entre o tamanho do bloco e o tamanho da mensagem.
+
+![PKCS#7 Padding](images/pkcs7_padding.jpg)
+
+### Feistel Network
+Uma das mais bem sucedidas cifras de chave simétrica por blocos é o DES. O núcleo desta cifra é constituído por redes de feistel, que são funções sempre invertíveis, mas construidas a partir de funções não invertíveis. As redes feistel são, na verdade, uma forma bastante engenhosa de construir PRPs (permutações pseudo-aleatórias) a partir de PRFs (funções pseudo-aleatórias).
+
+Para a **cifragem** o algoritmo funciona da seguinte forma:
+1. Divide o bloco de dados em duas metades (L e R).
+2. Aplica uma função de transformação `f` na metade direita (R) do bloco.
+3. Aplica uma função XOR entre a metade esquerda (L) e a metade direita (R) do bloco.
+4. Troca as metades do bloco (a metade esquerda passa para a direita inalterada).
+5. Repete o processo até que todas as rondas sejam executadas.
+
+Para a **decifragem** o algoritmo funciona da seguinte forma:
+1. Divide o bloco de dados em duas metades (L e R).
+2. Aplica uma função de transformação `f` na metade esquerda (L) do bloco.
+3. Aplica uma função XOR entre a metade esquerda (L) e a metade direita (R) do bloco.
+4. Troca as metades do bloco (a metade direita passa para a esquerda inalterada).
+5. Repete o processo até que todas as rondas sejam executadas.
+
+![Rede Feistel](images/feistel_network.png)
+
+Mais que isso, um teorema de **Luby–Rackoff**, de 1985, assegura que qualquer rede de Feistel com mais do que **3 rondas** construída a partir de PRFs seguras define um **PRP seguro**, se a função de transformação `f` for uma PRF segura. O DES especifica **16 rondas**, enquanto que o 3DES especifica **48 rondas**.
+
+### Função de Transformação `f`
+A função de transformação `f` é uma função que recebe como entrada um bloco de 4 bytes e produz como saída um bloco de 4 bytes. Esta função é composta por o uso de S-boxes, operação essa que dá **difusão** aos dados de entrada (alteram a estatística dos dados).
+
+A função de transformação `f` é a seguinte:
+1. Pega num bloco de 4 bytes, e divide-o em 4 blocos de 1 byte.
+2. O primeiro bloco de memória (offset 0) será o valor da S-Box no indíce do último bloco de memória (offset 3).
+3. O segundo bloco de memória (offset 1) será o valor da S-Box no indíce do XOR entre o último bloco de memória (offset 3) e o penúltimo bloco de memória (offset 2).
+4. O terceiro bloco de memória (offset 2) será o valor da S-Box no indíce do XOR entre o penúltimo bloco de memória (offset 2) e o ante-penultimo bloco de memória (offset 1).
+5. O quarto bloco de memória (offset 3) será o valor da S-Box no indíce do XOR entre o ante-penultimo bloco de memória (offset 1) e o primeiro bloco de memória (offset 0).
+
+![Função de Transformação](images/f_function.png)
+
+Exemplo de uma função de transformação `f` em `C`:
+```c
+uint8_t SBox [256];
+uint8_t in [4];
+uint8_t out [4];
+
+uint8_t index = in[3];
+out[0] = SBox[index];
+
+index = (index + in[2]);
+out[1] = SBox[index];
+
+index = (index + in[1]);
+out[2] = SBox[index];
+
+index = (index + in[0]);
+out[3] = SBox[index];
+```
+
+### Substituiton Boxes (S-Boxes)
+As S-Boxes são tabelas de substituição que transformam valores de entrada em valores de saída de maneira não linear. As S-boxes servem para tornar as relações entre os bits dos dados de entrada e saída complicadas, tornando a criptografia mais robusta contra ataques como a análise diferencial e a análise linear.
+
+#### Geração da S-Box inicial
+A S-Box inicial é gerada a partir de uma palavra-passe textual, que é convertida para uma chave de 256 bits (32 bytes) usando a função de hash SHA-256. É obtido o primeiro byte da chave, adicionado à S-Box e é feito a função da chave anterior, este processo é repetido até que a S-Box esteja completa.
+
+```
+S-Box[0] = Hash(palavra-passe)[0]
+```
+
+Após a geração da S-Box inicial, é replicado esses mesmos 256 bytes para uma lista 16 vezes (16 S-Boxes).
+
+#### Round Robin Shuffle
+O Round Robin Shuffle é um algoritmo de embaralhamento que é usado para mistura os elementos de uma lista de maneira uniforme. 
+
+O algoritmo funciona da seguinte forma:
+1. É inicializado o valor do `shift` com 1.
+2. Para cada elemento da nova lista, é feito um `shift` para a esquerda com o valor do `shift` atual.
+3. O `shift` é incrementado em 1, caso o valor do mesmo seja igual ou superior ao tamanho da lista é feito um reset do `shift` para 1.
+4. Repete o processo até que todos os elementos da lista sejam embaralhados.
+
+Este algoritmo é usado para embaralhar as S-Boxes geradas anteriormente adicionando uma pseudo-aleatoriedade ao algoritmo e adicionando **confusão** ao mesmo (não existe relação baixa entre a chave, o texto em claro e o texto cifrado).
+
+
+## Compilação e Execução do Projeto
 Para **compilar** o projeto em C, basta executar o makefile:
 ```console
 $ make
@@ -33,52 +130,9 @@ $ ./des -d <palavra-passe>
 
 Depois é só usar o `stdin` para inserir o texto a decifrar e o `stdout` para obter o texto decifrado.
 
-## Medidas
-- Tamanho do Bloco: `64 bits` (8 bytes)
-- Chave de gerada pela palavra-passe: `256 bits` (32 bytes)
-- Número Rondas: `16`
-- Número S-Boxes: `16`
-- Tamanho da S-Box: `256` bytes
+## Testes e desempenho
 
-## Feistel Network
-A rede Feistel é uma rede de permutação de dados que é utilizada em criptografia.
-
-O algoritmo functiona da seguinte forma:
-1. divide o bloco de dados em duas metades
-2. aplica uma função de transformação `f` na metade direita (R) do bloco
-3. aplica uma função XOR entre a metade esquerda (L) e a metade direita (R) do bloco
-4. troca as metades do bloco (a metade esquerda passa para a direita inalterada)
-5. repete o processo até que todas as rondas sejam executadas
-
-## Substituiton Boxes (S-Boxes)
-As S-Boxes são tabelas de substituição que são utilizadas para substituir blocos de bits de entrada por blocos de bits de saída.
-
-O uso das S-boxes é o seguinte:
-1. pega num bloco de 4 bytes, e divide-o em 4 blocos de 1 byte.
-2. o primeiro bloco de memória (offset 0) será o valor da S-Box no indíce do último bloco de memória (offset 3)
-3. o segundo bloco de memória (offset 1) será o valor da S-Box no indíce do Xor entre o último bloco de memória (offset 3) e o penúltimo bloco de memória (offset 2)
-4. o terceiro bloco de memória (offset 2) será o valor da S-Box no indíce do Xor entre o penúltimo bloco de memória (offset 2) e o ante-penultimo bloco de memória (offset 1)
-5. o quarto bloco de memória (offset 3) será o valor da S-Box no indíce do Xor entre o ante-penultimo bloco de memória (offset 1) e o primeiro bloco de memória (offset 0).
-
-Em C:
-```c
-uint8_t SBox [256];
-uint8_t in [4];
-uint8_t out [4];
-
-uint8_t index = in[3];
-out[0] = SBox[index];
-
-index = (index + in[2]);
-out[1] = SBox[index];
-
-index = (index + in[1]);
-out[2] = SBox[index];
-
-index = (index + in[0]);
-out[3] = SBox[index];
-```
-
+### Testes Unitários para as S-Boxes
 Input de teste em `C`:
 ```c
     uint64_t input_test_block = {
@@ -92,6 +146,18 @@ Input de teste em `C`:
         00, 00, 00, 00, 00, 00, 00, 01};
 ```
 
+Output de teste em `C`:
+```c
+    uint64_t output_test_block[] = {
+        0x3c, 0x58, 0x2b, 0x44, 0x04, 0x4b, 0x5f, 0x1c,
+        0x3d, 0x55, 0x20, 0x41, 0x06, 0x4e, 0x69, 0x64,
+        0x3d, 0x59, 0x2b, 0x47, 0x05, 0x45, 0x58, 0x19,
+        0x3c, 0x5b, 0x21, 0x43, 0x07, 0x4c, 0x6c, 0x63,
+        0x3a, 0x53, 0x19, 0x48, 0x0c, 0x6a, 0x60, 0x7c,
+        0x3f, 0x15, 0x18, 0x62, 0x1d, 0x0c, 0x7f, 0x62,
+        0x3e, 0x28, 0x12, 0x7e, 0x12, 0x7a, 0x63, 0x7c,
+        0x02, 0x6d, 0x16, 0x4b, 0x0d, 0x6a, 0x26, 0x6c};
+```
 S-boxes de teste em `C`:
 ```c
 
@@ -369,6 +435,4 @@ S-boxes de teste em `C`:
         0xf8, 0xf8, 0xf9, 0xf9, 0xfa, 0xfa, 0xfb, 0xfb, 0xfc, 0xfc, 0xfd, 0xfd, 0xfe, 0xfe, 0xff, 0xff};
 ```
 
-
-## Performance
-Ainda nada...
+Continuar aqui...

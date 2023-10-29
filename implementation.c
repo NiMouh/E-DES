@@ -25,6 +25,12 @@ uint8_t *feistel_function(const uint8_t *input_block, const uint8_t *s_box)
 {
     uint8_t *output_block = (uint8_t *)malloc(HALF_BLOCK_SIZE);
 
+    if (output_block == NULL) // memory allocation error
+    {
+        printf("Error allocating memory for output block\n");
+        exit(1);
+    }
+
     uint8_t index = input_block[3];
     output_block[0] = s_box[index];
 
@@ -302,9 +308,23 @@ void encrypt(const uint8_t *plaintext, const uint8_t *password, uint8_t **cipher
     for (size_t block_index = 0; block_index < padded_plaintext_size; block_index += BLOCK_SIZE)
     {
         uint8_t *block = (uint8_t *)malloc(BLOCK_SIZE);
+
+        if (block == NULL) // memory allocation error
+        {
+            printf("Error allocating memory for block\n");
+            exit(1);
+        }
+
         memcpy(block, padded_plaintext + block_index, BLOCK_SIZE);
 
         uint8_t *cipher_block = (uint8_t *)malloc(BLOCK_SIZE);
+
+        if (cipher_block == NULL) // memory allocation error
+        {
+            printf("Error allocating memory for cipher block\n");
+            exit(1);
+        }
+
         feistel_network(block, sboxes, &cipher_block);
 
         memcpy(*ciphertext + block_index, cipher_block, BLOCK_SIZE);
@@ -354,9 +374,23 @@ void decrypt(const uint8_t *ciphertext, const size_t ciphertext_size, const uint
     for (size_t block_index = 0; block_index < ciphertext_size; block_index += BLOCK_SIZE)
     {
         uint8_t *block = (uint8_t *)malloc(BLOCK_SIZE);
+
+        if (block == NULL) // memory allocation error
+        {
+            printf("Error allocating memory for block\n");
+            exit(1);
+        }
+
         memcpy(block, ciphertext + block_index, BLOCK_SIZE);
 
         uint8_t *decipher_block = (uint8_t *)malloc(BLOCK_SIZE);
+
+        if (decipher_block == NULL) // memory allocation error
+        {
+            printf("Error allocating memory for decipher block\n");
+            exit(1);
+        }
+
         inverse_feistel_network(block, sboxes, &decipher_block);
 
         memcpy(padded_plaintext + block_index, decipher_block, BLOCK_SIZE);
