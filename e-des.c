@@ -1,6 +1,18 @@
 #include "implementation.h"
 
 /**
+ * @file e-des.c
+ * @brief Implementation of the e-des and des-ecb modes
+ * 
+ * This file contains the main function and a link to the implementation.h file, with the implementation
+ * of the e-des and des-ecb modes (using the openssl library).
+ *
+ * @author Ana Vidal (118408)
+ * @author Simão Andrade (118345)
+ * @date 2023-10-20
+ */
+
+/**
  * Main function, it receives the arguments and calls the encrypt or decrypt function
  *
  * @param argc number of arguments
@@ -39,77 +51,59 @@ int main(int argc, char **argv)
     int e_des_mode = strcmp(argv[1], "e-des") == 0;
     int ecb_des_mode = strcmp(argv[1], "des-ecb") == 0;
 
-    if (e_des_mode)
-    {
-        if (cipher)
+    if (cipher)
+    { // Encrypt
+        uint8_t *ciphertext;
+        size_t ciphertext_size;
+
+        if (e_des_mode)
         {
-            // Encrypt
-            uint8_t *ciphertext;
-            size_t ciphertext_size;
             encrypt(readed_bytes, password, &ciphertext, &ciphertext_size);
-
-            // Write the ciphertext to stdout
-            write_bytes(ciphertext, ciphertext_size);
-
-            // Free memory
-            free(ciphertext);
         }
-        else if (decipher)
+        else if (ecb_des_mode)
         {
-            // Decrypt
-            uint8_t *plaintext;
-            size_t plaintext_size;
-            decrypt(readed_bytes, number_of_readed_bytes, password, &plaintext, &plaintext_size);
-
-            // Write the plaintext to stdout
-            write_bytes(plaintext, plaintext_size);
-
-            // Free memory
-            free(plaintext);
+            ecb_encrypt(readed_bytes, password, &ciphertext, &ciphertext_size);
         }
         else
         {
-            fprintf(stderr, "Usage: The only valid modes are -e and -d\n");
+            fprintf(stderr, "Usage: The only valid modes are e-des and des-ecb\n");
             exit(1);
         }
+
+        // Write the ciphertext to stdout
+        write_bytes(ciphertext, ciphertext_size);
+
+        // Free memory
+        free(ciphertext);
     }
-    else if (ecb_des_mode)
-    {
-        if (cipher)
+    else if (decipher)
+    { // Decrypt
+        uint8_t *plaintext;
+        size_t plaintext_size;
+
+        if (e_des_mode)
         {
-            // Encrypt
-            uint8_t *ciphertext;
-            size_t ciphertext_size;
-            ecb_encrypt(readed_bytes, password, &ciphertext);
-
-            // Write the ciphertext to stdout
-            write_bytes(ciphertext, ciphertext_size);
-
-            // Free memory
-            free(ciphertext);
+            decrypt(readed_bytes, number_of_readed_bytes, password, &plaintext, &plaintext_size);
         }
-        else if (decipher)
+        else if (ecb_des_mode)
         {
-            // Decrypt
-            uint8_t *plaintext;
-            size_t plaintext_size;
-            ecb_decrypt(readed_bytes, number_of_readed_bytes, password, &plaintext);
-
-            // Write the plaintext to stdout
-            write_bytes(plaintext, plaintext_size);
-
-            // Free memory
-            free(plaintext);
+            ecb_decrypt(readed_bytes, number_of_readed_bytes, password, &plaintext, &plaintext_size);
         }
         else
         {
-            fprintf(stderr, "Usage: The only valid modes are -e and -d\n");
+            fprintf(stderr, "Usage: The only valid modes are e-des and des-ecb\n");
             exit(1);
         }
+
+        // Write the plaintext to stdout
+        write_bytes(plaintext, plaintext_size);
+
+        // Free memory
+        free(plaintext);
     }
     else
     {
-        fprintf(stderr, "Usage: The only valid modes are e-des and des-ecb\n");
+        fprintf(stderr, "Usage: The only valid modes are -e and -d\n");
         exit(1);
     }
 

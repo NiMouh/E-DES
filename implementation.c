@@ -114,55 +114,107 @@ void inverse_feistel_network(const uint8_t *block, const struct s_box *sboxes, u
     memcpy(*cipher_block + HALF_BLOCK_SIZE, R, HALF_BLOCK_SIZE);
 }
 
-void generate_key(const uint8_t *password, uint8_t **key)
+void generate_key(const uint8_t *password, uint8_t *key)
 {
     SHA256_CTX ctx;
     SHA256_Init(&ctx);
     SHA256_Update(&ctx, password, strlen((char *)password));
-    SHA256_Final(*key, &ctx);
+    SHA256_Final(key, &ctx);
 }
 
-void generate_random_bytes(const uint8_t *key, uint8_t *bytes, int num_bytes)
+void generate_single_sbox(const uint8_t *password, uint8_t *single_sbox)
 {
-    // Initialize the pseudo-random number generator with the key
-    srand(*(unsigned int *)key);
+    uint8_t key[SHA256_DIGEST_LENGTH];
 
-    // Initialize an array to keep track of how many times each byte has been used
-    int byteCount[256] = {0};
+    generate_key(password, key);
 
-    for (int index = 0; index < num_bytes; index++)
+    for (int index = 0; index < S_BOX_SIZE; index++) // initialize the single sbox
     {
-        // Find a byte value that has not been used 16 times
-        uint8_t randomByte;
-        do
-        {
-            randomByte = rand() & 0xFF; // Generate a random byte
-        } while (byteCount[randomByte] >= NUMBER_OF_S_BOXES);
-
-        bytes[index] = randomByte;
-        byteCount[randomByte]++;
+        single_sbox[index] = index;
     }
+
+    for (int currentIndex = 0; currentIndex < S_BOX_SIZE; currentIndex++)
+    {
+        int newIndex = (currentIndex + key[currentIndex % SHA256_DIGEST_LENGTH]) % S_BOX_SIZE;
+        uint8_t currentByte = single_sbox[currentIndex];
+
+        single_sbox[currentIndex] = single_sbox[newIndex];
+        single_sbox[newIndex] = currentByte;
+    }
+
+    memset(key, 0, SHA256_DIGEST_LENGTH);
 }
 
-void generate_sboxes(const uint8_t *key, struct s_box *sboxes)
+void round_robin_shuffle(uint8_t *array, size_t size)
 {
-    if (key != NULL)
-    {
-        // Generate the random bytes
-        uint8_t *random_bytes = (uint8_t *)malloc(S_BOX_SIZE * NUMBER_OF_ROUNDS);
-        generate_random_bytes(key, random_bytes, S_BOX_SIZE * NUMBER_OF_ROUNDS);
+    uint8_t *shuffledArray = (uint8_t *)malloc(size);
 
-        // Copy the random bytes to the sboxes
-        for (int sbox_index = 0; sbox_index < NUMBER_OF_ROUNDS; sbox_index++)
+    if (shuffledArray == NULL)
+    {
+        fprintf(stderr, "Memory allocation error\n");
+        exit(1);
+    }
+
+    size_t shift = 1;
+    size_t new_index = 0;
+    for (size_t index = 0; index < size; index++)
+    {
+        shuffledArray[new_index] = array[index];
+        new_index = (new_index + shift) % size;
+
+        shift++;
+        if (shift >= size)
         {
-            for (int item_index = 0; item_index < S_BOX_SIZE; item_index++)
-            {
-                sboxes[sbox_index].sbox[item_index] = random_bytes[sbox_index * S_BOX_SIZE + item_index];
-            }
+            shift = 1;
         }
-
-        free(random_bytes);
     }
+
+    for (size_t index = 0; index < size; index++)
+    {
+        array[index] = shuffledArray[index];
+    }
+
+    free(shuffledArray);
+}
+
+void generate_sboxes(const uint8_t *password, struct s_box *sboxes)
+{
+    uint8_t *single_sbox = (uint8_t *)malloc(S_BOX_SIZE);
+
+    if (single_sbox == NULL) // memory allocation error
+    {
+        printf("Error allocating memory for single sbox\n");
+        exit(1);
+    }
+
+    generate_single_sbox(password, single_sbox);
+
+    uint8_t *random_bytes = (uint8_t *)malloc(NUMBER_OF_BYTES_IN_ALL_S_BOXES);
+
+    if (random_bytes == NULL) // memory allocation error
+    {
+        printf("Error allocating memory for random bytes\n");
+        exit(1);
+    }
+
+    for (int index = 0; index < NUMBER_OF_S_BOXES; index++)
+    {
+        memcpy(random_bytes + index * S_BOX_SIZE, single_sbox, S_BOX_SIZE);
+    }
+
+    free(single_sbox);
+
+    round_robin_shuffle(random_bytes, NUMBER_OF_BYTES_IN_ALL_S_BOXES);
+
+    for (int sbox_index = 0; sbox_index < NUMBER_OF_S_BOXES; sbox_index++)
+    {
+        for (int item_index = 0; item_index < S_BOX_SIZE; item_index++)
+        {
+            sboxes[sbox_index].sbox[item_index] = random_bytes[sbox_index * S_BOX_SIZE + item_index];
+        }
+    }
+
+    free(random_bytes);
 }
 
 void add_padding(const uint8_t *plaintext, size_t plaintext_length, uint8_t **padded_plaintext, size_t *padded_length)
@@ -237,9 +289,7 @@ void encrypt(const uint8_t *plaintext, const uint8_t *password, uint8_t **cipher
         exit(1);
     }
 
-    generate_key(password, &key);
-
-    generate_sboxes(key, sboxes);
+    generate_sboxes(password, sboxes);
 
     *ciphertext = (uint8_t *)malloc(padded_plaintext_size);
 
@@ -290,9 +340,7 @@ void decrypt(const uint8_t *ciphertext, const size_t ciphertext_size, const uint
         exit(1);
     }
 
-    generate_key(password, &key);
-
-    generate_sboxes(key, sboxes);
+    generate_sboxes(password, sboxes);
 
     size_t padded_plaintext_size = ciphertext_size;
     uint8_t *padded_plaintext = (uint8_t *)malloc(padded_plaintext_size);
@@ -324,7 +372,7 @@ void decrypt(const uint8_t *ciphertext, const size_t ciphertext_size, const uint
     free(padded_plaintext);
 }
 
-void ecb_encrypt(const uint8_t *plaintext, const uint8_t *password, uint8_t **ciphertext)
+void ecb_encrypt(const uint8_t *plaintext, const uint8_t *password, uint8_t **ciphertext, size_t *ciphertext_size)
 {
     // Declare key schedule
     DES_cblock des_key;
@@ -341,8 +389,8 @@ void ecb_encrypt(const uint8_t *plaintext, const uint8_t *password, uint8_t **ci
     add_padding(plaintext, plaintext_len, &padded_plaintext, &padded_len);
 
     // Declare ciphertext
-    size_t ciphertext_len = padded_len;
-    *ciphertext = (uint8_t *)malloc(ciphertext_len);
+    *ciphertext = (uint8_t *)malloc(padded_len);
+    *ciphertext_size = padded_len;
 
     if (*ciphertext == NULL) // memory allocation error
     {
@@ -357,10 +405,9 @@ void ecb_encrypt(const uint8_t *plaintext, const uint8_t *password, uint8_t **ci
     }
 
     free(padded_plaintext);
-
 }
 
-void ecb_decrypt(const uint8_t *ciphertext, const size_t ciphertext_size, const uint8_t *password, uint8_t **plaintext)
+void ecb_decrypt(const uint8_t *ciphertext, const size_t ciphertext_size, const uint8_t *password, uint8_t **plaintext, size_t *plaintext_size)
 {
     // Declare key schedule
     DES_cblock des_key;
@@ -387,8 +434,7 @@ void ecb_decrypt(const uint8_t *ciphertext, const size_t ciphertext_size, const 
     }
 
     // Remove padding
-    size_t plaintext_len;
-    remove_padding(padded_plaintext, padded_plaintext_len, plaintext, &plaintext_len);
+    remove_padding(padded_plaintext, padded_plaintext_len, plaintext, plaintext_size);
 
     free(padded_plaintext);
 }

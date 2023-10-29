@@ -21,6 +21,7 @@
 #define NUMBER_OF_ROUNDS 16
 #define NUMBER_OF_S_BOXES 16
 #define S_BOX_SIZE 256 // 256 bytes
+#define NUMBER_OF_BYTES_IN_ALL_S_BOXES (NUMBER_OF_S_BOXES * S_BOX_SIZE) // 4096 bytes
 
 // Constants for the performance testing
 #define NUMBER_OF_TESTS 100000
@@ -82,28 +83,36 @@ void feistel_network(const uint8_t *block, const struct s_box *sboxes, uint8_t *
 void inverse_feistel_network(const uint8_t *block, const struct s_box *sboxes, uint8_t **cipher_block);
 
 /**
- * Function that generates the key by the password, using SHA256
+ * Function that generates the key from the password, using SHA256
  *
  * @param password the password (uint8_t array)
  * @param key pointer to the key (uint8_t array)
  */
-void generate_key(const uint8_t *password, uint8_t **key);
+void generate_key(const uint8_t *password, uint8_t *key);
 
 /**
- * Function that generates the random bytes by the key
- *
- * @param key the key (uint8_t array)
- * @param bytes pointer to the random bytes (uint8_t array)
- */
-void generate_random_bytes(const uint8_t *key, uint8_t *bytes, int num_bytes);
+ * Function that generates the single sbox by the key
+ * 
+ * @param password the password (uint8_t array)
+ * @param single_sbox pointer to the single sbox (uint8_t array)
+*/
+void generate_single_sbox(const uint8_t *password, uint8_t *single_sbox);
 
 /**
- * Function that generates the sboxes by the key
+ * Function that will apply the round robin algorithm to shuffle the bytes
+ * 
+ * @param array the array (uint8_t array)
+ * @param size the size of the array (size_t)
+*/
+void round_robin_shuffle(uint8_t *array, size_t size);
+
+/**
+ * Function that generates the sboxes from the password
  *
- * @param key the key (uint8_t array)
+ * @param password the password (uint8_t array)
  * @param sboxes pointer to the sboxes (struct s_box array)
  */
-void generate_sboxes(const uint8_t *key, struct s_box *sboxes);
+void generate_sboxes(const uint8_t *password, struct s_box *sboxes);
 
 /**
  * Function that will apply the PCKS#7 padding to the plaintext, it receives the plaintext, the plaintext length, a pointer to the padded plaintext and a pointer to the padded length
@@ -151,9 +160,10 @@ void decrypt(const uint8_t *ciphertext, const size_t ciphertext_size, const uint
  * @param plaintext the plaintext (uint8_t array)
  * @param password the password (uint8_t array)
  * @param ciphertext pointer to the ciphertext (uint8_t array)
+ * @param ciphertext_size pointer to the ciphertext size (size_t)
  *
  */
-void ecb_encrypt(const uint8_t *plaintext, const uint8_t *password, uint8_t **ciphertext);
+void ecb_encrypt(const uint8_t *plaintext, const uint8_t *password, uint8_t **ciphertext, size_t *ciphertext_size);
 
 /**
  * ECB Decrypt Function, receives the ciphertext, the password and a pointer to the plaintext
@@ -162,8 +172,9 @@ void ecb_encrypt(const uint8_t *plaintext, const uint8_t *password, uint8_t **ci
  * @param ciphertext_size the ciphertext size (size_t)
  * @param password the password (uint8_t array)
  * @param plaintext pointer to the plaintext (uint8_t array)
+ * @param plaintext_size pointer to the plaintext size (size_t)
  *
  */
-void ecb_decrypt(const uint8_t *ciphertext, const size_t ciphertext_size, const uint8_t *password, uint8_t **plaintext);
+void ecb_decrypt(const uint8_t *ciphertext, const size_t ciphertext_size, const uint8_t *password, uint8_t **plaintext, size_t *plaintext_size);
 
 #endif

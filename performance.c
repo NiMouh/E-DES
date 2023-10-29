@@ -144,7 +144,7 @@ void speed(const int number_of_tests, const size_t number_of_bytes){
 
         // Encrypt
         start_each = clock();
-        ecb_encrypt(random_bytes, password, &ciphertext_ecb);
+        ecb_encrypt(random_bytes, password, &ciphertext_ecb, &ciphertext_size_ecb);
         end_each = clock();
 
         // Calculate the time
@@ -272,7 +272,7 @@ void speed(const int number_of_tests, const size_t number_of_bytes){
 
         // Decrypt
         start_each = clock();
-        ecb_decrypt(random_bytes, number_of_bytes, password, &plaintext_ecb);
+        ecb_decrypt(random_bytes, number_of_bytes, password, &plaintext_ecb, &plaintext_size_ecb);
         end_each = clock();
 
         // Calculate the time
