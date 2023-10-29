@@ -62,6 +62,13 @@ void feistel_network(const uint8_t *block, const struct s_box *sboxes, uint8_t *
     memcpy(R, block + HALF_BLOCK_SIZE, HALF_BLOCK_SIZE);
 
     uint8_t *M = (uint8_t *)malloc(HALF_BLOCK_SIZE);
+
+    if (M == NULL) // memory allocation error
+    {
+        printf("Error allocating memory for M.\n");
+        exit(1);
+    }
+
     for (int round = 0; round < NUMBER_OF_ROUNDS; round++)
     {
         // Copy the right to a temporary variable
@@ -81,6 +88,10 @@ void feistel_network(const uint8_t *block, const struct s_box *sboxes, uint8_t *
     // Concatenate the left and right halfs
     memcpy(*cipher_block, L, HALF_BLOCK_SIZE);
     memcpy(*cipher_block + HALF_BLOCK_SIZE, R, HALF_BLOCK_SIZE);
+
+    free(M);
+    free(L);
+    free(R);
 }
 
 void inverse_feistel_network(const uint8_t *block, const struct s_box *sboxes, uint8_t **cipher_block)
@@ -99,6 +110,13 @@ void inverse_feistel_network(const uint8_t *block, const struct s_box *sboxes, u
     memcpy(R, block + HALF_BLOCK_SIZE, HALF_BLOCK_SIZE);
 
     uint8_t *M = (uint8_t *)malloc(HALF_BLOCK_SIZE);
+
+    if (M == NULL) // memory allocation error
+    {
+        printf("Error allocating memory for M.\n");
+        exit(1);
+    }
+
     for (int round = NUMBER_OF_ROUNDS - 1; round >= 0; round--)
     {
         // Copy the left to a temporary variable
@@ -118,6 +136,10 @@ void inverse_feistel_network(const uint8_t *block, const struct s_box *sboxes, u
     // Concatenate the left and right halfs
     memcpy(*cipher_block, L, HALF_BLOCK_SIZE);
     memcpy(*cipher_block + HALF_BLOCK_SIZE, R, HALF_BLOCK_SIZE);
+
+    free(M);
+    free(L);
+    free(R);
 }
 
 void generate_key(const uint8_t *password, uint8_t *key)
