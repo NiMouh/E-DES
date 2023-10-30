@@ -28,7 +28,7 @@ O PKCS#7 é um esquema de preenchimento amplamente utilizado, funciona da seguin
 
 ![PKCS#7 Padding](images/pkcs7_padding.jpg)
 
-### Feistel Network
+### Redes Feistel
 Uma das mais bem sucedidas cifras de chave simétrica por blocos é o DES. O núcleo desta cifra é constituído por redes de feistel, que são funções sempre invertíveis, mas construidas a partir de funções não invertíveis. As redes feistel são, na verdade, uma forma bastante engenhosa de construir PRPs (permutações pseudo-aleatórias) a partir de PRFs (funções pseudo-aleatórias).
 
 Para a **cifragem** o algoritmo funciona da seguinte forma:
@@ -80,7 +80,7 @@ index = (index + in[0]);
 out[3] = SBox[index];
 ```
 
-### Substituiton Boxes (S-Boxes)
+### Tabelas de Substituição (S-Boxes)
 As S-Boxes são tabelas de substituição que transformam valores de entrada em valores de saída de maneira não linear. As S-boxes servem para tornar as relações entre os bits dos dados de entrada e saída complicadas, tornando a criptografia mais robusta contra ataques como a análise diferencial e a análise linear.
 
 #### Geração da S-Box inicial
@@ -92,8 +92,8 @@ S-Box[0] = Hash(palavra-passe)[0]
 
 Após a geração da S-Box inicial, é replicado esses mesmos 256 bytes para uma lista 16 vezes (16 S-Boxes).
 
-#### Round Robin Shuffle
-O Round Robin Shuffle é um algoritmo de embaralhamento que é usado para mistura os elementos de uma lista de maneira uniforme. 
+#### Round-robin Shuffle
+O Round-robin é um algoritmo de embaralhamento que é usado para mistura os elementos de uma lista de maneira uniforme. 
 
 O algoritmo funciona da seguinte forma:
 1. É inicializado o valor do `shift` com 1.
