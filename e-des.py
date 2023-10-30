@@ -1,94 +1,81 @@
 import unittest
 import hashlib
+import argparse
+import sys
 
 NUMBER_OF_ROUNDS = 16
-BLOCK_SIZE = 8
-HALF_BLOCK_SIZE = 4
-S_BOX_SIZE = 256
-SHA_256_SIZE = 32
+NUMBER_OF_SBOXES = 16
+BLOCK_SIZE = 8 # bytes
+HALF_BLOCK_SIZE = 4 # bytes
+S_BOX_SIZE = 256 # bytes
+SHA_256_SIZE = 32 # bytes
 
 def feistel_function(input_block : bytearray, sbox : bytearray) -> bytearray:
-    # Declare the output block
     output_block = bytearray()
 
-    # The index is the last byte of the input block
     index = input_block[3]
     output_block.append(sbox[index])
 
-    # The index is the second to last byte of the input block
     index = (index + input_block[2]) % 256
     output_block.append(sbox[index])
 
-    # The index is the third to last byte of the input block
     index = (index + input_block[1]) % 256
     output_block.append(sbox[index])
 
-    # The index is the fourth to last byte of the input block
     index = (index + input_block[0]) % 256
     output_block.append(sbox[index])
 
-    # Return the output block
     return output_block
 
 def feistel_network(block : bytearray, sboxes : list) -> bytearray:
 
-    # Split the block into two halves (L and R)
-    L = block[:HALF_BLOCK_SIZE]
-    R = block[HALF_BLOCK_SIZE:]
+    L = bytearray(block[:HALF_BLOCK_SIZE])
+    R = bytearray(block[HALF_BLOCK_SIZE:])
 
-    # For every round
     for round in range(NUMBER_OF_ROUNDS):
         feistel_result = feistel_function(R, sboxes[round])
 
-        # For every byte in the feistel result
         for byte_index in range(HALF_BLOCK_SIZE):
-            # The new R is the old L XOR the feistel result and the new L is the old R
             R[byte_index], L[byte_index] = L[byte_index] ^ feistel_result[byte_index], R[byte_index]
     
-    # Return the block
     return L + R
 
 def inverse_feistel_network(block : bytearray, sboxes : list) -> bytearray:
-    
-    # Split the block into two halves (L and R)
-    L = block[:HALF_BLOCK_SIZE]
-    R = block[HALF_BLOCK_SIZE:]
+
+    L = bytearray(block[:HALF_BLOCK_SIZE])
+    R = bytearray(block[HALF_BLOCK_SIZE:])
     
     # For every round, from the last to the first
     for round in range(NUMBER_OF_ROUNDS - 1, -1, -1):
 
         feistel_result = feistel_function(L, sboxes[round])
-    
-        # For every byte in the feistel result
+
         for byte_index in range(HALF_BLOCK_SIZE):
-            # The new L is the old R XOR the feistel result and the new R is the old L
             L[byte_index], R[byte_index] = R[byte_index] ^ feistel_result[byte_index], L[byte_index]
         
-    # Return the block
     return L + R
 
 def add_padding(plaintext : bytearray) -> bytearray:
-    # Declare the size of the plaintext
     plaintext_size = len(plaintext)
 
-    # Declare the number of padding bytes
     number_of_padding_bytes = BLOCK_SIZE - (plaintext_size % BLOCK_SIZE)
 
-    # Add the number of padding bytes to the plaintext
-    plaintext.extend(bytearray([number_of_padding_bytes] * number_of_padding_bytes))
+    padded_data = bytearray(plaintext)
 
-    # Return the padded plaintext
-    return plaintext
+    for _ in range(number_of_padding_bytes):
+        padded_data.append(number_of_padding_bytes)
+
+    return padded_data
 
 def remove_padding(padded_plaintext : bytearray) -> bytearray:
-    # Declare the size of the padded plaintext
     padded_plaintext_size = len(padded_plaintext)
 
-    # Declare the number of padding bytes
-    number_of_padding_bytes = padded_plaintext[padded_plaintext_size - 1]
+    last_byte = padded_plaintext[padded_plaintext_size - 1]
+    number_of_padding_bytes = int(bytes([last_byte]).decode('utf-8'))
 
-    # Remove the padding bytes from the padded plaintext
-    return padded_plaintext[:padded_plaintext_size - number_of_padding_bytes]
+    plaintext = bytearray(padded_plaintext[:padded_plaintext_size - number_of_padding_bytes])
+
+    return plaintext
 
 def generate_key(password : bytearray) -> bytearray:
     hash = hashlib.sha256()
@@ -100,10 +87,8 @@ def generate_key(password : bytearray) -> bytearray:
     return key
 
 def generate_single_box(password : bytearray) -> bytearray:
-    # Declare the sbox
     sbox = bytearray(range(S_BOX_SIZE))
 
-    # Generate the first key
     key = generate_key(password)
 
     for current_index in range(S_BOX_SIZE):
@@ -130,20 +115,17 @@ def round_robin_shuffle(sboxes : list) -> list:
     return new_sboxes
 
 def generate_sboxes(password : bytearray) -> list:
-    # Generate a single sbox
+
     single_sbox = generate_single_box(password)
 
-    # Save each byte of the sbox in a list 16 times (4096 bytes)
     random_bytes = bytearray()
-    for _ in range(NUMBER_OF_ROUNDS):
+    for _ in range(NUMBER_OF_SBOXES):
         random_bytes.extend(single_sbox)
 
-    # Shuffle the sboxes
     random_bytes = round_robin_shuffle(random_bytes)
 
-    # Declare an array of arrays
-    sboxes = [bytearray(0 for _ in range(S_BOX_SIZE)) for _ in range(NUMBER_OF_ROUNDS)]
-    for sbox_index in range(NUMBER_OF_ROUNDS):
+    sboxes = [bytearray(0 for _ in range(S_BOX_SIZE)) for _ in range(NUMBER_OF_SBOXES)]
+    for sbox_index in range(NUMBER_OF_SBOXES):
         for item_index in range(S_BOX_SIZE):
             sboxes[sbox_index][item_index] = random_bytes[sbox_index * S_BOX_SIZE + item_index]
     
@@ -151,70 +133,60 @@ def generate_sboxes(password : bytearray) -> list:
 
 def encrypt(plaintext : bytearray, password : bytearray) -> bytearray:
 
-    # Declare the ciphertext
     ciphertext = bytearray()
 
-    # Add Padding
     padded_plaintext = add_padding(plaintext)
     padded_plaintext_size = len(padded_plaintext)
 
-    # Create S-boxes
     sboxes = generate_sboxes(password)
 
-    # For every block in the plaintext
     for block_index in range(0, padded_plaintext_size, BLOCK_SIZE):
-        # Get the block
-        block = plaintext[block_index:block_index + BLOCK_SIZE]
 
-        # Put the block through the feistel network
+        block = padded_plaintext[block_index:block_index + BLOCK_SIZE]
         block = feistel_network(block, sboxes)
 
-        # Add the block to the ciphertext
         ciphertext.extend(block)
-    
-    # Return the ciphertext
+
     return ciphertext
 
 def decrypt(ciphertext : bytearray, password : bytearray) -> bytearray:
-    # Declare the size of the ciphertext
     ciphertext_size = len(ciphertext)
 
-    # Declare the plaintext
     padded_plaintext = bytearray()
 
-    # Create S-boxes
     sboxes = generate_sboxes(password)
 
-    # For every block in the ciphertext
     for block_index in range(0, ciphertext_size, BLOCK_SIZE):
-        # Get the block
-        block = ciphertext[block_index:block_index + BLOCK_SIZE]
 
-        # Put the block through the feistel network
+        block = ciphertext[block_index:block_index + BLOCK_SIZE]
         block = inverse_feistel_network(block, sboxes)
 
-        # Add the block to the plaintext
         padded_plaintext.extend(block)
         
-    # Remove padding
     plaintext = remove_padding(padded_plaintext)
 
-    # Return the plaintext
     return plaintext
 
-if __name__ == '__main__':
-    input_block = bytearray("Era uma vez...", 'utf-8')
-    
-    password = bytearray("password", 'utf-8')
+if __name__ == "__main__":
 
-    ciphertext = encrypt(input_block, password)
+    parser = argparse.ArgumentParser(description='Encrypt or decrypt a file using the E-DES algorithm.')
+    parser.add_argument('-c', '--cipher', action='store_true', help='Cipher the input file')
+    parser.add_argument('-d', '--decipher', action='store_true', help='Decipher the input file')
+    parser.add_argument('-p', '--password', required=True, help='Password used to encrypt/decrypt the file')
+    arguments = parser.parse_args()
 
-    print(ciphertext)
+    password = bytearray(arguments.password, 'utf-8')
 
-    plaintext = decrypt(ciphertext, password)
-
-    # Print the plaintext in UTF-8
-    print(plaintext)
+    if arguments.cipher:
+        plaintext = sys.stdin.buffer.read()
+        ciphertext = encrypt(plaintext, password)
+        sys.stdout.buffer.write(ciphertext)
+    elif arguments.decipher:
+        ciphertext = sys.stdin.buffer.read()
+        plaintext = decrypt(ciphertext, password)
+        sys.stdout.buffer.write(plaintext)
+    else:
+        print('Please specify if you want to cipher or decipher the input file.')
 
 class TestFeistelFunctions(unittest.TestCase):
 
