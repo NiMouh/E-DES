@@ -1,4 +1,11 @@
-import unittest
+"""!
+@file e_des.py
+@brief This module implements the E-DES algorithm.
+@author Ana Vidal (118408)
+@author Simão Andrade (118345)
+@date 2023-10-20
+"""
+
 import hashlib
 import argparse
 import sys
@@ -16,6 +23,15 @@ NUMBER_OF_RUNS = 100000
 BUFFER_SIZE = 4 * 1024 # 4 KiB
 
 def feistel_function(input_block : bytearray, sbox : bytearray) -> bytearray:
+    """!
+    @brief This function implements the Feistel function.
+
+    @param input_block The 4 byte input block to the Feistel function.
+    @param sbox The S-Box used in the Feistel function.
+
+    @return The output block of the Feistel function.
+    """
+
     output_block = bytearray()
 
     index = input_block[3]
@@ -33,6 +49,14 @@ def feistel_function(input_block : bytearray, sbox : bytearray) -> bytearray:
     return output_block
 
 def feistel_network(block : bytearray, sboxes : list) -> bytearray:
+    """!
+    @brief This function implements the Feistel network.
+
+    @param block The 8 byte input block to the Feistel network.
+    @param sboxes The S-Boxes used in the Feistel network.
+
+    @return The output block of the Feistel network.
+    """
 
     L = bytearray(block[:HALF_BLOCK_SIZE])
     R = bytearray(block[HALF_BLOCK_SIZE:])
@@ -46,6 +70,14 @@ def feistel_network(block : bytearray, sboxes : list) -> bytearray:
     return L + R
 
 def inverse_feistel_network(block : bytearray, sboxes : list) -> bytearray:
+    """!
+    @brief This function implements the inverse Feistel network.
+
+    @param block The 8 byte input block to the inverse Feistel network.
+    @param sboxes The S-Boxes used in the inverse Feistel network.
+
+    @return The output block of the inverse Feistel network.
+    """
 
     L = bytearray(block[:HALF_BLOCK_SIZE])
     R = bytearray(block[HALF_BLOCK_SIZE:])
@@ -61,6 +93,14 @@ def inverse_feistel_network(block : bytearray, sboxes : list) -> bytearray:
     return L + R
 
 def add_padding(plaintext : bytearray) -> bytearray:
+    """!
+    @brief This function adds padding to the plaintext.
+
+    @param plaintext The plaintext to be padded.
+
+    @return The padded plaintext.
+    """
+
     plaintext_size = len(plaintext)
 
     number_of_padding_bytes = BLOCK_SIZE - (plaintext_size % BLOCK_SIZE)
@@ -71,6 +111,13 @@ def add_padding(plaintext : bytearray) -> bytearray:
     return padded_data
 
 def remove_padding(padded_plaintext: bytearray) -> bytearray:
+    """!
+    @brief This function removes padding from the padded plaintext.
+
+    @param padded_plaintext The padded plaintext to be unpadded.
+
+    @return The unpadded plaintext.
+    """
 
     last_byte = bytes([padded_plaintext[-1]]).decode('utf-8')
     if not last_byte.isdigit():
@@ -85,6 +132,14 @@ def remove_padding(padded_plaintext: bytearray) -> bytearray:
     return plaintext
 
 def generate_key(password : bytearray) -> bytearray:
+    """!
+    @brief This function generates the key used to generate the S-Boxes.
+
+    @param password The password used to generate the key.
+
+    @return The hashed key.
+    """
+
     hash = hashlib.sha256()
 
     hash.update(password)
@@ -94,6 +149,14 @@ def generate_key(password : bytearray) -> bytearray:
     return key
 
 def generate_single_box(password : bytearray) -> bytearray:
+    """!
+    @brief This function generates a single S-Box.
+
+    @param password The password used to generate the S-Box.
+
+    @return The generated S-Box.
+    """
+
     sbox = bytearray(range(S_BOX_SIZE))
 
     key = generate_key(password)
@@ -105,6 +168,14 @@ def generate_single_box(password : bytearray) -> bytearray:
     return sbox
 
 def round_robin_shuffle(sboxes : list) -> list:
+    """!
+    @brief This function implements the round robin shuffle.
+
+    @param sboxes The S-Boxes to be shuffled.
+
+    @return The shuffled S-Boxes.
+    """
+
     new_sboxes = bytearray(0 for _ in range(len(sboxes)))
     size_of_sboxes = len(sboxes)
 
@@ -122,6 +193,13 @@ def round_robin_shuffle(sboxes : list) -> list:
     return new_sboxes
 
 def generate_sboxes(password : bytearray) -> list:
+    """!
+    @brief This function generates the S-Boxes.
+
+    @param password The password used to generate the S-Boxes.
+
+    @return The generated S-Boxes.
+    """
 
     single_sbox = generate_single_box(password)
 
@@ -139,6 +217,14 @@ def generate_sboxes(password : bytearray) -> list:
     return sboxes
 
 def encrypt(plaintext : bytearray, password : bytearray) -> bytearray:
+    """!
+    @brief This function encrypts the plaintext.
+
+    @param plaintext The plaintext to be encrypted.
+    @param password The password used to encrypt the plaintext.
+
+    @return The encrypted ciphertext.
+    """
 
     ciphertext = bytearray()
 
@@ -157,6 +243,15 @@ def encrypt(plaintext : bytearray, password : bytearray) -> bytearray:
     return ciphertext
 
 def decrypt(ciphertext : bytearray, password : bytearray) -> bytearray:
+    """
+    This function decrypts the ciphertext.
+
+    :param ciphertext: The ciphertext to be decrypted.
+    :param password: The password used to decrypt the ciphertext.
+
+    :return: The decrypted plaintext.
+    """
+
     ciphertext_size = len(ciphertext)
 
     padded_plaintext = bytearray()
@@ -175,6 +270,20 @@ def decrypt(ciphertext : bytearray, password : bytearray) -> bytearray:
     return plaintext
 
 if __name__ == "__main__":
+    """!
+    @brief This is the main function of the program.
+
+    This function parses command line arguments, reads from stdin, calls the appropriate functions, and writes to stdout.
+
+    @par Command line arguments:
+    - -e, --cipher: Cipher the input file.
+    - -d, --decipher: Decipher the input file.
+    - -p, --password: Password used to encrypt/decrypt the file.
+
+    @par Example usage:
+    - python3 e_des.py -e -p password < input_file > output_file
+    - python3 e_des.py -d -p password < input_file > output_file
+    """
 
     parser = argparse.ArgumentParser(description='Encrypt or decrypt a file using the E-DES algorithm.')
     parser.add_argument('-e', '--cipher', action='store_true', help='Cipher the input file')

@@ -1,0 +1,51 @@
+\hypertarget{e-des_8c}{}\doxysection{e-\/des.c File Reference}
+\label{e-des_8c}\index{e-\/des.c@{e-\/des.c}}
+
+
+Implementation of the e-\/des and des-\/ecb modes.  
+
+
+{\ttfamily \#include \char`\"{}implementation.\+h\char`\"{}}\newline
+Include dependency graph for e-\/des.c\+:
+% FIG 0
+\doxysubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+int \mbox{\hyperlink{e-des_8c_a3c04138a5bfe5d72780bb7e82a18e627}{main}} (int argc, char $\ast$$\ast$argv)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Implementation of the e-\/des and des-\/ecb modes. 
+
+This file contains the main function where the program starts.
+
+\begin{DoxyAuthor}{Author}
+Ana Vidal (118408) 
+
+Simão Andrade (118345) 
+\end{DoxyAuthor}
+\begin{DoxyDate}{Date}
+2023-\/10-\/20 
+\end{DoxyDate}
+
+
+\doxysubsection{Function Documentation}
+\mbox{\Hypertarget{e-des_8c_a3c04138a5bfe5d72780bb7e82a18e627}\label{e-des_8c_a3c04138a5bfe5d72780bb7e82a18e627}} 
+\index{e-\/des.c@{e-\/des.c}!main@{main}}
+\index{main@{main}!e-\/des.c@{e-\/des.c}}
+\doxysubsubsection{\texorpdfstring{main()}{main()}}
+{\footnotesize\ttfamily int main (\begin{DoxyParamCaption}\item[{int}]{argc,  }\item[{char $\ast$$\ast$}]{argv }\end{DoxyParamCaption})}
+
+Main function, it receives the arguments and calls the encrypt or decrypt function
+
+
+\begin{DoxyParams}{Parameters}
+{\em argc} & number of arguments \\
+\hline
+{\em argv} & arguments\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+0 if the program runs without errors, 1 otherwise 
+\end{DoxyReturn}

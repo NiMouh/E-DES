@@ -1,10 +1,24 @@
+"""!
+@file performance.py
+@brief This file contains the functions used to measure the performance of the E-DES algorithm.
+@author Ana Vidal (118408)
+@author Simão Andrade (118345)
+@date 2023-10-20
+"""
+
 import e_des
 import time
 from Crypto.Cipher import DES
 
-
-# Generate random data using '/dev/urandom'
 def generate_random_data(number_of_bytes : int) -> bytearray:
+    """!
+    @brief This function generates random data.
+
+    @param number_of_bytes The number of bytes to generate.
+
+    @return The random data.
+    """
+
     urandom_file = open('/dev/urandom', 'rb')
     random_data = urandom_file.read(number_of_bytes)
     urandom_file.close()
@@ -12,11 +26,20 @@ def generate_random_data(number_of_bytes : int) -> bytearray:
     return random_data
 
 def speed_encrypt(number_of_tests : bytearray, number_of_bytes : int) -> None:
+    """!
+    This function measures the encryption time of DES-ECB and E-DES.
+
+    @param number_of_tests The number of tests to run.
+    @param number_of_bytes The number of bytes to encrypt.
+
+    @return None
+    """
+
 
     random_data = generate_random_data(number_of_bytes)
     password = generate_random_data(e_des.BLOCK_SIZE)
 
-    # DES-ECB encryption time (in nanoseconds)
+    # DES-ECB encryption time
     time_list_ecb = []
     for _ in range(number_of_tests):
         start_time = time.time_ns()
@@ -26,9 +49,7 @@ def speed_encrypt(number_of_tests : bytearray, number_of_bytes : int) -> None:
 
         time_list_ecb.append(end_time - start_time)
     
-    # E-DES encryption time (in nanoseconds)
-
-    # Generate sboxes
+    # E-DES encryption time
     sboxes = e_des.generate_sboxes(password)
 
     time_list_e_des = []
@@ -41,8 +62,6 @@ def speed_encrypt(number_of_tests : bytearray, number_of_bytes : int) -> None:
 
         time_list_e_des.append(end_time - start_time)
 
-    
-    # Print results
     print("Number of tests: {}".format(number_of_tests))
     print("Number of bytes: {}".format(number_of_bytes))
 
@@ -58,11 +77,19 @@ def speed_encrypt(number_of_tests : bytearray, number_of_bytes : int) -> None:
 
 
 def speed_decrypt(number_of_tests : bytearray, number_of_bytes : int) -> None:
+    """!
+    @brief This function measures the decryption time of DES-ECB and E-DES.
+
+    @param number_of_tests The number of tests to run.
+    @param number_of_bytes The number of bytes to decrypt.
+
+    @return None
+    """
 
     random_data = generate_random_data(number_of_bytes)
     password = generate_random_data(e_des.BLOCK_SIZE)
 
-    # DES-ECB decryption time (in nanoseconds)
+    # DES-ECB decryption time
     time_list_ecb = []
     for _ in range(number_of_tests):
         cipher = DES.new(password, DES.MODE_ECB)
@@ -74,9 +101,7 @@ def speed_decrypt(number_of_tests : bytearray, number_of_bytes : int) -> None:
 
         time_list_ecb.append(end_time - start_time)
 
-    # E-DES decryption time (in nanoseconds)
-
-    # Generate sboxes
+    # E-DES decryption time
     sboxes = e_des.generate_sboxes(password)
 
     time_list_e_des = []

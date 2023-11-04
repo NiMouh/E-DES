@@ -1,0 +1,303 @@
+\hypertarget{e__des_8py}{}\doxysection{e\+\_\+des.\+py File Reference}
+\label{e__des_8py}\index{e\_des.py@{e\_des.py}}
+
+
+This module implements the E-\/\+DES algorithm.  
+
+
+\doxysubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+bytearray \mbox{\hyperlink{e__des_8py_a056a6e7c2095c6633621b174e805f0bc}{e\+\_\+des.\+feistel\+\_\+function}} (bytearray input\+\_\+block, bytearray sbox)
+\begin{DoxyCompactList}\small\item\em This function implements the Feistel function. \end{DoxyCompactList}\item 
+bytearray \mbox{\hyperlink{e__des_8py_a2e724f440d5ac5bf0eeeeae81ac1a48b}{e\+\_\+des.\+feistel\+\_\+network}} (bytearray block, list sboxes)
+\begin{DoxyCompactList}\small\item\em This function implements the Feistel network. \end{DoxyCompactList}\item 
+bytearray \mbox{\hyperlink{e__des_8py_a58ca89760433c6a1823d2ff617755741}{e\+\_\+des.\+inverse\+\_\+feistel\+\_\+network}} (bytearray block, list sboxes)
+\begin{DoxyCompactList}\small\item\em This function implements the inverse Feistel network. \end{DoxyCompactList}\item 
+bytearray \mbox{\hyperlink{e__des_8py_a1cbcf0bddd328355acf4a85559b51ccf}{e\+\_\+des.\+add\+\_\+padding}} (bytearray plaintext)
+\begin{DoxyCompactList}\small\item\em This function adds padding to the plaintext. \end{DoxyCompactList}\item 
+bytearray \mbox{\hyperlink{e__des_8py_a0a7b880cf855e36557a6b26f4916c8f1}{e\+\_\+des.\+remove\+\_\+padding}} (bytearray padded\+\_\+plaintext)
+\begin{DoxyCompactList}\small\item\em This function removes padding from the padded plaintext. \end{DoxyCompactList}\item 
+bytearray \mbox{\hyperlink{e__des_8py_abd05c330a96015ccecc5152fe1ac7eb1}{e\+\_\+des.\+generate\+\_\+key}} (bytearray password)
+\begin{DoxyCompactList}\small\item\em This function generates the key used to generate the S-\/\+Boxes. \end{DoxyCompactList}\item 
+bytearray \mbox{\hyperlink{e__des_8py_a92e708576d25b7ee28aa1cb579bf39a9}{e\+\_\+des.\+generate\+\_\+single\+\_\+box}} (bytearray password)
+\begin{DoxyCompactList}\small\item\em This function generates a single S-\/\+Box. \end{DoxyCompactList}\item 
+list \mbox{\hyperlink{e__des_8py_a4f54a909c7e919963905d0ec55d9c8e3}{e\+\_\+des.\+round\+\_\+robin\+\_\+shuffle}} (list sboxes)
+\begin{DoxyCompactList}\small\item\em This function implements the round robin shuffle. \end{DoxyCompactList}\item 
+list \mbox{\hyperlink{e__des_8py_adcf71f352a4ce1a4a8256abce1e58e79}{e\+\_\+des.\+generate\+\_\+sboxes}} (bytearray password)
+\begin{DoxyCompactList}\small\item\em This function generates the S-\/\+Boxes. \end{DoxyCompactList}\item 
+bytearray \mbox{\hyperlink{e__des_8py_a8216340e6539b8d7d6f9dcf06581b0f6}{e\+\_\+des.\+encrypt}} (bytearray plaintext, bytearray password)
+\begin{DoxyCompactList}\small\item\em This function encrypts the plaintext. \end{DoxyCompactList}\item 
+bytearray \mbox{\hyperlink{e__des_8py_a074f064efe172624edf113c64304e7c2}{e\+\_\+des.\+decrypt}} (bytearray ciphertext, bytearray password)
+\end{DoxyCompactItemize}
+\doxysubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{e__des_8py_aa050109c6da4a9481471c777a0779fb1}\label{e__des_8py_aa050109c6da4a9481471c777a0779fb1}} 
+int {\bfseries e\+\_\+des.\+NUMBER\+\_\+\+OF\+\_\+\+ROUNDS} = 16
+\item 
+\mbox{\Hypertarget{e__des_8py_a525121ddfb0fe3fc5c538a610c79104d}\label{e__des_8py_a525121ddfb0fe3fc5c538a610c79104d}} 
+int {\bfseries e\+\_\+des.\+NUMBER\+\_\+\+OF\+\_\+\+SBOXES} = 16
+\item 
+\mbox{\Hypertarget{e__des_8py_ad2ed013416be5ff49ad6804e464dda2c}\label{e__des_8py_ad2ed013416be5ff49ad6804e464dda2c}} 
+int {\bfseries e\+\_\+des.\+BLOCK\+\_\+\+SIZE} = 8
+\item 
+\mbox{\Hypertarget{e__des_8py_a706da5ea0a297d5ca9f8bc4c598ef6cc}\label{e__des_8py_a706da5ea0a297d5ca9f8bc4c598ef6cc}} 
+int {\bfseries e\+\_\+des.\+HALF\+\_\+\+BLOCK\+\_\+\+SIZE} = 4
+\item 
+\mbox{\Hypertarget{e__des_8py_a8061815675f15b7eea37f2456f476df4}\label{e__des_8py_a8061815675f15b7eea37f2456f476df4}} 
+int {\bfseries e\+\_\+des.\+S\+\_\+\+BOX\+\_\+\+SIZE} = 256
+\item 
+\mbox{\Hypertarget{e__des_8py_aece5c5cfbcb02e3d4b62e8cce944ee07}\label{e__des_8py_aece5c5cfbcb02e3d4b62e8cce944ee07}} 
+int {\bfseries e\+\_\+des.\+SHA\+\_\+256\+\_\+\+SIZE} = 32
+\item 
+\mbox{\Hypertarget{e__des_8py_ae33e47810c6d387eee388d1835fa8d99}\label{e__des_8py_ae33e47810c6d387eee388d1835fa8d99}} 
+int {\bfseries e\+\_\+des.\+NUMBER\+\_\+\+OF\+\_\+\+RUNS} = 100000
+\item 
+\mbox{\Hypertarget{e__des_8py_a79c4bb8ac898e939d9a87627f5a1695c}\label{e__des_8py_a79c4bb8ac898e939d9a87627f5a1695c}} 
+int {\bfseries e\+\_\+des.\+BUFFER\+\_\+\+SIZE} = 4 $\ast$ 1024
+\item 
+\mbox{\Hypertarget{e__des_8py_a5a01b213aa05d236319d2b59b84db292}\label{e__des_8py_a5a01b213aa05d236319d2b59b84db292}} 
+{\bfseries e\+\_\+des.\+parser} = argparse.\+Argument\+Parser(description=\textquotesingle{}Encrypt or \mbox{\hyperlink{implementation_8h_a29e27efe48e1e92cb26a8c34065e457e}{decrypt}} a file using the E-\/DES algorithm.\textquotesingle{})
+\item 
+\mbox{\Hypertarget{e__des_8py_a987a93d698ed14e85f185bd03e5dc2d2}\label{e__des_8py_a987a93d698ed14e85f185bd03e5dc2d2}} 
+{\bfseries e\+\_\+des.\+action}
+\item 
+\mbox{\Hypertarget{e__des_8py_a2a15a8d638a06b19c2151e6f0e03fc23}\label{e__des_8py_a2a15a8d638a06b19c2151e6f0e03fc23}} 
+{\bfseries e\+\_\+des.\+help}
+\item 
+\mbox{\Hypertarget{e__des_8py_afdf9d604f9df5d05820761d8b0acedbf}\label{e__des_8py_afdf9d604f9df5d05820761d8b0acedbf}} 
+{\bfseries e\+\_\+des.\+required}
+\item 
+\mbox{\Hypertarget{e__des_8py_a94617ebf079f98044af27d2bcf35c5d7}\label{e__des_8py_a94617ebf079f98044af27d2bcf35c5d7}} 
+{\bfseries e\+\_\+des.\+True}
+\item 
+\mbox{\Hypertarget{e__des_8py_a9158457667de90a0033700df6dab9ff8}\label{e__des_8py_a9158457667de90a0033700df6dab9ff8}} 
+{\bfseries e\+\_\+des.\+arguments} = parser.\+parse\+\_\+args()
+\item 
+\mbox{\Hypertarget{e__des_8py_a940feb09ef23dc8c33d9978a9e85f2ef}\label{e__des_8py_a940feb09ef23dc8c33d9978a9e85f2ef}} 
+{\bfseries e\+\_\+des.\+password} = bytearray(arguments.\+password, \textquotesingle{}utf-\/8\textquotesingle{})
+\item 
+\mbox{\Hypertarget{e__des_8py_a521cdc9e234200f9d998d9bde84f7510}\label{e__des_8py_a521cdc9e234200f9d998d9bde84f7510}} 
+{\bfseries e\+\_\+des.\+plaintext} = sys.\+stdin.\+buffer.\+read()
+\item 
+\mbox{\Hypertarget{e__des_8py_a9438adfa4fbce07760f118a77b73fbaa}\label{e__des_8py_a9438adfa4fbce07760f118a77b73fbaa}} 
+bytearray {\bfseries e\+\_\+des.\+ciphertext} = \mbox{\hyperlink{implementation_8h_a47602bb849f6e312b45abb39b598b5ca}{encrypt}}(plaintext, password)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+This module implements the E-\/\+DES algorithm. 
+
+\begin{DoxyAuthor}{Author}
+Ana Vidal (118408) 
+
+Simão Andrade (118345) 
+\end{DoxyAuthor}
+\begin{DoxyDate}{Date}
+2023-\/10-\/20 
+\end{DoxyDate}
+
+
+\doxysubsection{Function Documentation}
+\mbox{\Hypertarget{e__des_8py_a1cbcf0bddd328355acf4a85559b51ccf}\label{e__des_8py_a1cbcf0bddd328355acf4a85559b51ccf}} 
+\index{e\_des.py@{e\_des.py}!add\_padding@{add\_padding}}
+\index{add\_padding@{add\_padding}!e\_des.py@{e\_des.py}}
+\doxysubsubsection{\texorpdfstring{add\_padding()}{add\_padding()}}
+{\footnotesize\ttfamily  bytearray e\+\_\+des.\+add\+\_\+padding (\begin{DoxyParamCaption}\item[{bytearray}]{plaintext }\end{DoxyParamCaption})}
+
+
+
+This function adds padding to the plaintext. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em plaintext} & The plaintext to be padded.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+The padded plaintext. 
+\end{DoxyReturn}
+\mbox{\Hypertarget{e__des_8py_a074f064efe172624edf113c64304e7c2}\label{e__des_8py_a074f064efe172624edf113c64304e7c2}} 
+\index{e\_des.py@{e\_des.py}!decrypt@{decrypt}}
+\index{decrypt@{decrypt}!e\_des.py@{e\_des.py}}
+\doxysubsubsection{\texorpdfstring{decrypt()}{decrypt()}}
+{\footnotesize\ttfamily  bytearray e\+\_\+des.\+decrypt (\begin{DoxyParamCaption}\item[{bytearray}]{ciphertext,  }\item[{bytearray}]{password }\end{DoxyParamCaption})}
+
+\begin{DoxyVerb}This function decrypts the ciphertext.
+
+:param ciphertext: The ciphertext to be decrypted.
+:param password: The password used to decrypt the ciphertext.
+
+:return: The decrypted plaintext.
+\end{DoxyVerb}
+ \mbox{\Hypertarget{e__des_8py_a8216340e6539b8d7d6f9dcf06581b0f6}\label{e__des_8py_a8216340e6539b8d7d6f9dcf06581b0f6}} 
+\index{e\_des.py@{e\_des.py}!encrypt@{encrypt}}
+\index{encrypt@{encrypt}!e\_des.py@{e\_des.py}}
+\doxysubsubsection{\texorpdfstring{encrypt()}{encrypt()}}
+{\footnotesize\ttfamily  bytearray e\+\_\+des.\+encrypt (\begin{DoxyParamCaption}\item[{bytearray}]{plaintext,  }\item[{bytearray}]{password }\end{DoxyParamCaption})}
+
+
+
+This function encrypts the plaintext. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em plaintext} & The plaintext to be encrypted. \\
+\hline
+{\em password} & The password used to encrypt the plaintext.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+The encrypted ciphertext. 
+\end{DoxyReturn}
+\mbox{\Hypertarget{e__des_8py_a056a6e7c2095c6633621b174e805f0bc}\label{e__des_8py_a056a6e7c2095c6633621b174e805f0bc}} 
+\index{e\_des.py@{e\_des.py}!feistel\_function@{feistel\_function}}
+\index{feistel\_function@{feistel\_function}!e\_des.py@{e\_des.py}}
+\doxysubsubsection{\texorpdfstring{feistel\_function()}{feistel\_function()}}
+{\footnotesize\ttfamily  bytearray e\+\_\+des.\+feistel\+\_\+function (\begin{DoxyParamCaption}\item[{bytearray}]{input\+\_\+block,  }\item[{bytearray}]{sbox }\end{DoxyParamCaption})}
+
+
+
+This function implements the Feistel function. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em input\+\_\+block} & The 4 byte input block to the Feistel function. \\
+\hline
+{\em sbox} & The S-\/\+Box used in the Feistel function.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+The output block of the Feistel function. 
+\end{DoxyReturn}
+\mbox{\Hypertarget{e__des_8py_a2e724f440d5ac5bf0eeeeae81ac1a48b}\label{e__des_8py_a2e724f440d5ac5bf0eeeeae81ac1a48b}} 
+\index{e\_des.py@{e\_des.py}!feistel\_network@{feistel\_network}}
+\index{feistel\_network@{feistel\_network}!e\_des.py@{e\_des.py}}
+\doxysubsubsection{\texorpdfstring{feistel\_network()}{feistel\_network()}}
+{\footnotesize\ttfamily  bytearray e\+\_\+des.\+feistel\+\_\+network (\begin{DoxyParamCaption}\item[{bytearray}]{block,  }\item[{list}]{sboxes }\end{DoxyParamCaption})}
+
+
+
+This function implements the Feistel network. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em block} & The 8 byte input block to the Feistel network. \\
+\hline
+{\em sboxes} & The S-\/\+Boxes used in the Feistel network.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+The output block of the Feistel network. 
+\end{DoxyReturn}
+\mbox{\Hypertarget{e__des_8py_abd05c330a96015ccecc5152fe1ac7eb1}\label{e__des_8py_abd05c330a96015ccecc5152fe1ac7eb1}} 
+\index{e\_des.py@{e\_des.py}!generate\_key@{generate\_key}}
+\index{generate\_key@{generate\_key}!e\_des.py@{e\_des.py}}
+\doxysubsubsection{\texorpdfstring{generate\_key()}{generate\_key()}}
+{\footnotesize\ttfamily  bytearray e\+\_\+des.\+generate\+\_\+key (\begin{DoxyParamCaption}\item[{bytearray}]{password }\end{DoxyParamCaption})}
+
+
+
+This function generates the key used to generate the S-\/\+Boxes. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em password} & The password used to generate the key.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+The hashed key. 
+\end{DoxyReturn}
+\mbox{\Hypertarget{e__des_8py_adcf71f352a4ce1a4a8256abce1e58e79}\label{e__des_8py_adcf71f352a4ce1a4a8256abce1e58e79}} 
+\index{e\_des.py@{e\_des.py}!generate\_sboxes@{generate\_sboxes}}
+\index{generate\_sboxes@{generate\_sboxes}!e\_des.py@{e\_des.py}}
+\doxysubsubsection{\texorpdfstring{generate\_sboxes()}{generate\_sboxes()}}
+{\footnotesize\ttfamily  list e\+\_\+des.\+generate\+\_\+sboxes (\begin{DoxyParamCaption}\item[{bytearray}]{password }\end{DoxyParamCaption})}
+
+
+
+This function generates the S-\/\+Boxes. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em password} & The password used to generate the S-\/\+Boxes.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+The generated S-\/\+Boxes. 
+\end{DoxyReturn}
+\mbox{\Hypertarget{e__des_8py_a92e708576d25b7ee28aa1cb579bf39a9}\label{e__des_8py_a92e708576d25b7ee28aa1cb579bf39a9}} 
+\index{e\_des.py@{e\_des.py}!generate\_single\_box@{generate\_single\_box}}
+\index{generate\_single\_box@{generate\_single\_box}!e\_des.py@{e\_des.py}}
+\doxysubsubsection{\texorpdfstring{generate\_single\_box()}{generate\_single\_box()}}
+{\footnotesize\ttfamily  bytearray e\+\_\+des.\+generate\+\_\+single\+\_\+box (\begin{DoxyParamCaption}\item[{bytearray}]{password }\end{DoxyParamCaption})}
+
+
+
+This function generates a single S-\/\+Box. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em password} & The password used to generate the S-\/\+Box.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+The generated S-\/\+Box. 
+\end{DoxyReturn}
+\mbox{\Hypertarget{e__des_8py_a58ca89760433c6a1823d2ff617755741}\label{e__des_8py_a58ca89760433c6a1823d2ff617755741}} 
+\index{e\_des.py@{e\_des.py}!inverse\_feistel\_network@{inverse\_feistel\_network}}
+\index{inverse\_feistel\_network@{inverse\_feistel\_network}!e\_des.py@{e\_des.py}}
+\doxysubsubsection{\texorpdfstring{inverse\_feistel\_network()}{inverse\_feistel\_network()}}
+{\footnotesize\ttfamily  bytearray e\+\_\+des.\+inverse\+\_\+feistel\+\_\+network (\begin{DoxyParamCaption}\item[{bytearray}]{block,  }\item[{list}]{sboxes }\end{DoxyParamCaption})}
+
+
+
+This function implements the inverse Feistel network. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em block} & The 8 byte input block to the inverse Feistel network. \\
+\hline
+{\em sboxes} & The S-\/\+Boxes used in the inverse Feistel network.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+The output block of the inverse Feistel network. 
+\end{DoxyReturn}
+\mbox{\Hypertarget{e__des_8py_a0a7b880cf855e36557a6b26f4916c8f1}\label{e__des_8py_a0a7b880cf855e36557a6b26f4916c8f1}} 
+\index{e\_des.py@{e\_des.py}!remove\_padding@{remove\_padding}}
+\index{remove\_padding@{remove\_padding}!e\_des.py@{e\_des.py}}
+\doxysubsubsection{\texorpdfstring{remove\_padding()}{remove\_padding()}}
+{\footnotesize\ttfamily  bytearray e\+\_\+des.\+remove\+\_\+padding (\begin{DoxyParamCaption}\item[{bytearray}]{padded\+\_\+plaintext }\end{DoxyParamCaption})}
+
+
+
+This function removes padding from the padded plaintext. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em padded\+\_\+plaintext} & The padded plaintext to be unpadded.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+The unpadded plaintext. 
+\end{DoxyReturn}
+\mbox{\Hypertarget{e__des_8py_a4f54a909c7e919963905d0ec55d9c8e3}\label{e__des_8py_a4f54a909c7e919963905d0ec55d9c8e3}} 
+\index{e\_des.py@{e\_des.py}!round\_robin\_shuffle@{round\_robin\_shuffle}}
+\index{round\_robin\_shuffle@{round\_robin\_shuffle}!e\_des.py@{e\_des.py}}
+\doxysubsubsection{\texorpdfstring{round\_robin\_shuffle()}{round\_robin\_shuffle()}}
+{\footnotesize\ttfamily  list e\+\_\+des.\+round\+\_\+robin\+\_\+shuffle (\begin{DoxyParamCaption}\item[{list}]{sboxes }\end{DoxyParamCaption})}
+
+
+
+This function implements the round robin shuffle. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em sboxes} & The S-\/\+Boxes to be shuffled.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+The shuffled S-\/\+Boxes. 
+\end{DoxyReturn}

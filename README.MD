@@ -149,6 +149,14 @@ $ python3 e_des.py -d -p <palavra-passe>
 
 Depois é só usar o `stdin` para inserir o texto a decifrar e o `stdout` para obter o texto decifrado.
 
+
+#### Doxygen
+
+Para **gerar** a documentação do projeto, basta executar o seguinte comando:
+```console
+$ doxygen Doxyfile
+```
+
 ## Testes e desempenho
 
 ### Testes Unitários para as S-Boxes

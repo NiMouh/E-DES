@@ -29,7 +29,7 @@ void generate_random_data(uint8_t *buffer, size_t buffer_size) {
  * @param number_of_tests number of tests to run (int)
  * @param number_of_bytes number of bytes to encrypt/decrypt (size_t)
  */
-void speed_encrypt(const int number_of_tests, const size_t number_of_bytes){
+void speed_encrypt(const int number_of_tests, const size_t number_of_bytes){ // TODO : FIX THIS FUNCTION
 
     // Time variables
     struct timespec start, end;

@@ -1,0 +1,90 @@
+\hypertarget{performance_8py}{}\doxysection{performance.\+py File Reference}
+\label{performance_8py}\index{performance.py@{performance.py}}
+
+
+This file contains the functions used to measure the performance of the E-\/\+DES algorithm.  
+
+
+\doxysubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+bytearray \mbox{\hyperlink{performance_8py_acafca27c861ba283f38c39e6653aeae4}{performance.\+generate\+\_\+random\+\_\+data}} (int number\+\_\+of\+\_\+bytes)
+\begin{DoxyCompactList}\small\item\em This function generates random data. \end{DoxyCompactList}\item 
+None \mbox{\hyperlink{performance_8py_adf68d57f665530ae4c2f690716be4f75}{performance.\+speed\+\_\+encrypt}} (bytearray number\+\_\+of\+\_\+tests, int number\+\_\+of\+\_\+bytes)
+\begin{DoxyCompactList}\small\item\em This function measures the encryption time of DES-\/\+ECB and E-\/\+DES. \end{DoxyCompactList}\item 
+None \mbox{\hyperlink{performance_8py_ae3386592b373700d50170f75fcb1843c}{performance.\+speed\+\_\+decrypt}} (bytearray number\+\_\+of\+\_\+tests, int number\+\_\+of\+\_\+bytes)
+\begin{DoxyCompactList}\small\item\em This function measures the decryption time of DES-\/\+ECB and E-\/\+DES. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+This file contains the functions used to measure the performance of the E-\/\+DES algorithm. 
+
+\begin{DoxyAuthor}{Author}
+Ana Vidal (118408) 
+
+Simão Andrade (118345) 
+\end{DoxyAuthor}
+\begin{DoxyDate}{Date}
+2023-\/10-\/20 
+\end{DoxyDate}
+
+
+\doxysubsection{Function Documentation}
+\mbox{\Hypertarget{performance_8py_acafca27c861ba283f38c39e6653aeae4}\label{performance_8py_acafca27c861ba283f38c39e6653aeae4}} 
+\index{performance.py@{performance.py}!generate\_random\_data@{generate\_random\_data}}
+\index{generate\_random\_data@{generate\_random\_data}!performance.py@{performance.py}}
+\doxysubsubsection{\texorpdfstring{generate\_random\_data()}{generate\_random\_data()}}
+{\footnotesize\ttfamily  bytearray performance.\+generate\+\_\+random\+\_\+data (\begin{DoxyParamCaption}\item[{int}]{number\+\_\+of\+\_\+bytes }\end{DoxyParamCaption})}
+
+
+
+This function generates random data. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em number\+\_\+of\+\_\+bytes} & The number of bytes to generate.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+The random data. 
+\end{DoxyReturn}
+\mbox{\Hypertarget{performance_8py_ae3386592b373700d50170f75fcb1843c}\label{performance_8py_ae3386592b373700d50170f75fcb1843c}} 
+\index{performance.py@{performance.py}!speed\_decrypt@{speed\_decrypt}}
+\index{speed\_decrypt@{speed\_decrypt}!performance.py@{performance.py}}
+\doxysubsubsection{\texorpdfstring{speed\_decrypt()}{speed\_decrypt()}}
+{\footnotesize\ttfamily  None performance.\+speed\+\_\+decrypt (\begin{DoxyParamCaption}\item[{bytearray}]{number\+\_\+of\+\_\+tests,  }\item[{int}]{number\+\_\+of\+\_\+bytes }\end{DoxyParamCaption})}
+
+
+
+This function measures the decryption time of DES-\/\+ECB and E-\/\+DES. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em number\+\_\+of\+\_\+tests} & The number of tests to run. \\
+\hline
+{\em number\+\_\+of\+\_\+bytes} & The number of bytes to decrypt.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+None 
+\end{DoxyReturn}
+\mbox{\Hypertarget{performance_8py_adf68d57f665530ae4c2f690716be4f75}\label{performance_8py_adf68d57f665530ae4c2f690716be4f75}} 
+\index{performance.py@{performance.py}!speed\_encrypt@{speed\_encrypt}}
+\index{speed\_encrypt@{speed\_encrypt}!performance.py@{performance.py}}
+\doxysubsubsection{\texorpdfstring{speed\_encrypt()}{speed\_encrypt()}}
+{\footnotesize\ttfamily  None performance.\+speed\+\_\+encrypt (\begin{DoxyParamCaption}\item[{bytearray}]{number\+\_\+of\+\_\+tests,  }\item[{int}]{number\+\_\+of\+\_\+bytes }\end{DoxyParamCaption})}
+
+
+
+This function measures the encryption time of DES-\/\+ECB and E-\/\+DES. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em number\+\_\+of\+\_\+tests} & The number of tests to run. \\
+\hline
+{\em number\+\_\+of\+\_\+bytes} & The number of bytes to encrypt.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+None 
+\end{DoxyReturn}
