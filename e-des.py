@@ -60,20 +60,22 @@ def add_padding(plaintext : bytearray) -> bytearray:
 
     number_of_padding_bytes = BLOCK_SIZE - (plaintext_size % BLOCK_SIZE)
 
-    padded_data = bytearray(plaintext)
-
-    for _ in range(number_of_padding_bytes):
-        padded_data.append(number_of_padding_bytes)
+    padding_byte = number_of_padding_bytes.to_bytes(1, byteorder='big')
+    padded_data = bytearray(plaintext + padding_byte * number_of_padding_bytes)
 
     return padded_data
 
-def remove_padding(padded_plaintext : bytearray) -> bytearray:
-    padded_plaintext_size = len(padded_plaintext)
+def remove_padding(padded_plaintext: bytearray) -> bytearray:
 
-    last_byte = padded_plaintext[padded_plaintext_size - 1]
-    number_of_padding_bytes = int(bytes([last_byte]).decode('utf-8'))
+    last_byte = bytes([padded_plaintext[-1]]).decode('utf-8')
+    if not last_byte.isdigit():
+        return padded_plaintext
 
-    plaintext = bytearray(padded_plaintext[:padded_plaintext_size - number_of_padding_bytes])
+    number_of_padding_bytes = int(last_byte)
+    if number_of_padding_bytes > BLOCK_SIZE:
+        return padded_plaintext
+
+    plaintext = bytearray(padded_plaintext[:-number_of_padding_bytes])
 
     return plaintext
 
@@ -170,7 +172,7 @@ def decrypt(ciphertext : bytearray, password : bytearray) -> bytearray:
 if __name__ == "__main__":
 
     parser = argparse.ArgumentParser(description='Encrypt or decrypt a file using the E-DES algorithm.')
-    parser.add_argument('-c', '--cipher', action='store_true', help='Cipher the input file')
+    parser.add_argument('-e', '--cipher', action='store_true', help='Cipher the input file')
     parser.add_argument('-d', '--decipher', action='store_true', help='Decipher the input file')
     parser.add_argument('-p', '--password', required=True, help='Password used to encrypt/decrypt the file')
     arguments = parser.parse_args()

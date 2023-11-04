@@ -48,31 +48,24 @@ uint8_t *feistel_function(const uint8_t *input_block, const uint8_t *s_box)
 
 void feistel_network(const uint8_t *block, const struct s_box *sboxes, uint8_t **cipher_block)
 {
-    uint8_t *L = (uint8_t *)malloc(HALF_BLOCK_SIZE);
-    uint8_t *R = (uint8_t *)malloc(HALF_BLOCK_SIZE);
-
-    if (L == NULL || R == NULL) // memory allocation error
-    {
-        printf("Error allocating memory for L and/or R.\n");
-        exit(1);
-    }
+    uint8_t L[HALF_BLOCK_SIZE];
+    uint8_t R[HALF_BLOCK_SIZE];
+    uint8_t M[HALF_BLOCK_SIZE];
 
     // Split the block in two halfs (L and R)
-    memcpy(L, block, HALF_BLOCK_SIZE);
-    memcpy(R, block + HALF_BLOCK_SIZE, HALF_BLOCK_SIZE);
-
-    uint8_t *M = (uint8_t *)malloc(HALF_BLOCK_SIZE);
-
-    if (M == NULL) // memory allocation error
+    for (int index = 0; index < HALF_BLOCK_SIZE; index++)
     {
-        printf("Error allocating memory for M.\n");
-        exit(1);
+        L[index] = block[index];
+        R[index] = block[index + HALF_BLOCK_SIZE];
     }
 
     for (int round = 0; round < NUMBER_OF_ROUNDS; round++)
     {
         // Copy the right to a temporary variable
-        memcpy(M, R, HALF_BLOCK_SIZE);
+        for (int index = 0; index < HALF_BLOCK_SIZE; index++)
+        {
+            M[index] = R[index];
+        }
 
         // Apply the feistel function to the right half
         uint8_t *feistel_result = feistel_function(R, sboxes[round].sbox);
@@ -82,45 +75,40 @@ void feistel_network(const uint8_t *block, const struct s_box *sboxes, uint8_t *
             R[index] = L[index] ^ feistel_result[index];
         }
 
-        memcpy(L, M, HALF_BLOCK_SIZE);
+        for (int index = 0; index < HALF_BLOCK_SIZE; index++)
+        {
+            L[index] = M[index];
+        }
     }
 
     // Concatenate the left and right halfs
-    memcpy(*cipher_block, L, HALF_BLOCK_SIZE);
-    memcpy(*cipher_block + HALF_BLOCK_SIZE, R, HALF_BLOCK_SIZE);
-
-    free(M);
-    free(L);
-    free(R);
+    for (int index = 0; index < HALF_BLOCK_SIZE; index++)
+    {
+        (*cipher_block)[index] = L[index];
+        (*cipher_block)[index + HALF_BLOCK_SIZE] = R[index];
+    }
 }
 
 void inverse_feistel_network(const uint8_t *block, const struct s_box *sboxes, uint8_t **cipher_block)
 {
-    uint8_t *L = (uint8_t *)malloc(HALF_BLOCK_SIZE);
-    uint8_t *R = (uint8_t *)malloc(HALF_BLOCK_SIZE);
-
-    if (L == NULL || R == NULL) // memory allocation error
-    {
-        printf("Error allocating memory for L and/or R.\n");
-        exit(1);
-    }
+    uint8_t L[HALF_BLOCK_SIZE];
+    uint8_t R[HALF_BLOCK_SIZE];
+    uint8_t M[HALF_BLOCK_SIZE];
 
     // Split the block in two halfs (L and R)
-    memcpy(L, block, HALF_BLOCK_SIZE);
-    memcpy(R, block + HALF_BLOCK_SIZE, HALF_BLOCK_SIZE);
-
-    uint8_t *M = (uint8_t *)malloc(HALF_BLOCK_SIZE);
-
-    if (M == NULL) // memory allocation error
+    for (int index = 0; index < HALF_BLOCK_SIZE; index++)
     {
-        printf("Error allocating memory for M.\n");
-        exit(1);
+        L[index] = block[index];
+        R[index] = block[index + HALF_BLOCK_SIZE];
     }
 
     for (int round = NUMBER_OF_ROUNDS - 1; round >= 0; round--)
     {
         // Copy the left to a temporary variable
-        memcpy(M, L, HALF_BLOCK_SIZE);
+        for (int index = 0; index < HALF_BLOCK_SIZE; index++)
+        {
+            M[index] = L[index];
+        }
 
         // Apply the inverse Feistel function to the right half
         uint8_t *feistel_result = feistel_function(L, sboxes[round].sbox);
@@ -130,16 +118,18 @@ void inverse_feistel_network(const uint8_t *block, const struct s_box *sboxes, u
             L[index] = R[index] ^ feistel_result[index];
         }
 
-        memcpy(R, M, HALF_BLOCK_SIZE);
+        for (int index = 0; index < HALF_BLOCK_SIZE; index++)
+        {
+            R[index] = M[index];
+        }
     }
 
     // Concatenate the left and right halfs
-    memcpy(*cipher_block, L, HALF_BLOCK_SIZE);
-    memcpy(*cipher_block + HALF_BLOCK_SIZE, R, HALF_BLOCK_SIZE);
-
-    free(M);
-    free(L);
-    free(R);
+    for (int index = 0; index < HALF_BLOCK_SIZE; index++)
+    {
+        (*cipher_block)[index] = L[index];
+        (*cipher_block)[index + HALF_BLOCK_SIZE] = R[index];
+    }
 }
 
 void generate_key(const uint8_t *password, uint8_t *key)
@@ -227,7 +217,10 @@ void generate_sboxes(const uint8_t *password, struct s_box *sboxes)
 
     for (int index = 0; index < NUMBER_OF_S_BOXES; index++)
     {
-        memcpy(random_bytes + index * S_BOX_SIZE, single_sbox, S_BOX_SIZE);
+        for (int item_index = 0; item_index < S_BOX_SIZE; item_index++)
+        {
+            random_bytes[index * S_BOX_SIZE + item_index] = single_sbox[item_index];
+        }
     }
 
     free(single_sbox);
@@ -261,12 +254,15 @@ void add_padding(const uint8_t *plaintext, size_t plaintext_length, uint8_t **pa
     }
 
     // Copy the original plaintext
-    memcpy(*padded_plaintext, plaintext, plaintext_length);
+    for (size_t index = 0; index < plaintext_length; index++)
+    {
+        (*padded_plaintext)[index] = plaintext[index];
+    }
 
     // Add padding before the null terminator
-    for (size_t i = plaintext_length; i < *padded_length; i++)
+    for (size_t index = plaintext_length; index < *padded_length; index++)
     {
-        (*padded_plaintext)[i] = padding_bytes + '0';
+        (*padded_plaintext)[index] = padding_bytes + '0';
     }
 }
 
@@ -290,7 +286,10 @@ void remove_padding(const uint8_t *padded_plaintext, size_t padded_length, uint8
     }
 
     // Copy the original plaintext including the null terminator
-    memcpy(*plaintext, padded_plaintext, *plaintext_length);
+    for (size_t index = 0; index < *plaintext_length; index++)
+    {
+        (*plaintext)[index] = padded_plaintext[index];
+    }
 }
 
 void encrypt(const uint8_t *plaintext, const uint8_t *password, uint8_t **ciphertext, size_t *ciphertext_size)
@@ -329,15 +328,7 @@ void encrypt(const uint8_t *plaintext, const uint8_t *password, uint8_t **cipher
 
     for (size_t block_index = 0; block_index < padded_plaintext_size; block_index += BLOCK_SIZE)
     {
-        uint8_t *block = (uint8_t *)malloc(BLOCK_SIZE);
-
-        if (block == NULL) // memory allocation error
-        {
-            printf("Error allocating memory for block\n");
-            exit(1);
-        }
-
-        memcpy(block, padded_plaintext + block_index, BLOCK_SIZE);
+        const uint8_t *block = padded_plaintext + block_index;
 
         uint8_t *cipher_block = (uint8_t *)malloc(BLOCK_SIZE);
 
@@ -349,10 +340,12 @@ void encrypt(const uint8_t *plaintext, const uint8_t *password, uint8_t **cipher
 
         feistel_network(block, sboxes, &cipher_block);
 
-        memcpy(*ciphertext + block_index, cipher_block, BLOCK_SIZE);
+        for (int index = 0; index < BLOCK_SIZE; index++)
+        {
+            (*ciphertext)[block_index + index] = cipher_block[index];
+        }
 
         // Free the block and cipher_block memory
-        free(block);
         free(cipher_block);
     }
 
@@ -395,15 +388,7 @@ void decrypt(const uint8_t *ciphertext, const size_t ciphertext_size, const uint
 
     for (size_t block_index = 0; block_index < ciphertext_size; block_index += BLOCK_SIZE)
     {
-        uint8_t *block = (uint8_t *)malloc(BLOCK_SIZE);
-
-        if (block == NULL) // memory allocation error
-        {
-            printf("Error allocating memory for block\n");
-            exit(1);
-        }
-
-        memcpy(block, ciphertext + block_index, BLOCK_SIZE);
+        const uint8_t *block = ciphertext + block_index;
 
         uint8_t *decipher_block = (uint8_t *)malloc(BLOCK_SIZE);
 
@@ -415,9 +400,11 @@ void decrypt(const uint8_t *ciphertext, const size_t ciphertext_size, const uint
 
         inverse_feistel_network(block, sboxes, &decipher_block);
 
-        memcpy(padded_plaintext + block_index, decipher_block, BLOCK_SIZE);
+        for (int index = 0; index < BLOCK_SIZE; index++)
+        {
+            padded_plaintext[block_index + index] = decipher_block[index];
+        }
 
-        free(block);
         free(decipher_block);
     }
 

@@ -105,7 +105,10 @@ Este algoritmo é usado para embaralhar as S-Boxes geradas anteriormente adicion
 
 
 ## Compilação e Execução do Projeto
-Para **compilar** o projeto em C, basta executar o makefile:
+
+### Em C
+
+Para **compilar**, basta executar o makefile:
 ```console
 $ make
 ```
@@ -126,6 +129,22 @@ Depois é só usar o `stdin` para inserir o texto a cifrar e o `stdout` para obt
 Para **decifrar**, basta executar o seguinte comando:
 ```console
 $ ./des -d <palavra-passe>
+```
+
+Depois é só usar o `stdin` para inserir o texto a decifrar e o `stdout` para obter o texto decifrado.
+
+### Em Python
+
+Para **cifrar**, basta executar o seguinte comando:
+```console
+$ python3 des.py -e -p <palavra-passe>
+```
+
+Depois é só usar o `stdin` para inserir o texto a cifrar e o `stdout` para obter o texto cifrado.
+
+Para **decifrar**, basta executar o seguinte comando:
+```console
+$ python3 des.py -d -p <palavra-passe>
 ```
 
 Depois é só usar o `stdin` para inserir o texto a decifrar e o `stdout` para obter o texto decifrado.
