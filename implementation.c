@@ -308,14 +308,6 @@ void encrypt(const uint8_t *plaintext, const uint8_t *password, uint8_t **cipher
         exit(1);
     }
 
-    uint8_t *key = (uint8_t *)malloc(KEY_SIZE);
-
-    if (key == NULL) // memory allocation error
-    {
-        printf("Error allocating memory for key\n");
-        exit(1);
-    }
-
     generate_sboxes(password, sboxes);
 
     *ciphertext = (uint8_t *)malloc(padded_plaintext_size);
@@ -367,14 +359,6 @@ void decrypt(const uint8_t *ciphertext, const size_t ciphertext_size, const uint
         exit(1);
     }
 
-    uint8_t *key = (uint8_t *)malloc(KEY_SIZE);
-
-    if (key == NULL) // memory allocation error
-    {
-        printf("Error allocating memory for key\n");
-        exit(1);
-    }
-
     generate_sboxes(password, sboxes);
 
     size_t padded_plaintext_size = ciphertext_size;
@@ -415,7 +399,7 @@ void decrypt(const uint8_t *ciphertext, const size_t ciphertext_size, const uint
     free(padded_plaintext);
 }
 
-void ecb_encrypt(const uint8_t *plaintext, const uint8_t *password, uint8_t **ciphertext, size_t *ciphertext_size)
+void ecb_encrypt(const uint8_t *plaintext, const uint8_t *password, uint8_t **ciphertext, size_t *ciphertext_size) 
 {
     // Declare key schedule
     DES_cblock des_key;

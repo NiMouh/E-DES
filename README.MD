@@ -120,7 +120,7 @@ $ make clean
 
 Para **cifrar**, basta executar o seguinte comando:
 ```console
-$ ./des -e <palavra-passe>
+$ ./e-des -e <palavra-passe>
 ```
 
 Depois é só usar o `stdin` para inserir o texto a cifrar e o `stdout` para obter o texto cifrado.
@@ -128,7 +128,7 @@ Depois é só usar o `stdin` para inserir o texto a cifrar e o `stdout` para obt
 
 Para **decifrar**, basta executar o seguinte comando:
 ```console
-$ ./des -d <palavra-passe>
+$ ./e-des -d <palavra-passe>
 ```
 
 Depois é só usar o `stdin` para inserir o texto a decifrar e o `stdout` para obter o texto decifrado.
@@ -137,14 +137,14 @@ Depois é só usar o `stdin` para inserir o texto a decifrar e o `stdout` para o
 
 Para **cifrar**, basta executar o seguinte comando:
 ```console
-$ python3 des.py -e -p <palavra-passe>
+$ python3 e_des.py -e -p <palavra-passe>
 ```
 
 Depois é só usar o `stdin` para inserir o texto a cifrar e o `stdout` para obter o texto cifrado.
 
 Para **decifrar**, basta executar o seguinte comando:
 ```console
-$ python3 des.py -d -p <palavra-passe>
+$ python3 e_des.py -d -p <palavra-passe>
 ```
 
 Depois é só usar o `stdin` para inserir o texto a decifrar e o `stdout` para obter o texto decifrado.

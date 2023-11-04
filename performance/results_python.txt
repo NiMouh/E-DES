@@ -1,0 +1,20 @@
+Number of tests: 100000
+Number of bytes: 4096
+DES-ECB encryption time (in nanoseconds):
+Minimum: 37545
+Maximum: 602490
+Average: 40908.40174
+E-DES encryption time (in nanoseconds):
+Minimum: 4381266
+Maximum: 17894386
+Average: 4873126.03999
+Number of tests: 100000
+Number of bytes: 4096
+DES-ECB decryption time (in nanoseconds):
+Minimum: 32783
+Maximum: 1417397
+Average: 34992.45637
+E-DES decryption time (in nanoseconds):
+Minimum: 4452871
+Maximum: 14892752
+Average: 4904921.04856

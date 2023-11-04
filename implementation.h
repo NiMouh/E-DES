@@ -23,6 +23,8 @@
 // Libraries for performance testing
 #include <openssl/des.h>
 #include <time.h>
+#include <unistd.h>
+#include <fcntl.h>
 
 // Constants for the implementation
 #define MAX_BYTES 1024
