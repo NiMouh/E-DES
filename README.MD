@@ -133,6 +133,11 @@ $ ./e-des -d <palavra-passe>
 
 Depois é só usar o `stdin` para inserir o texto a decifrar e o `stdout` para obter o texto decifrado.
 
+Para **testar** a performance do algoritmo, basta executar o seguinte comando:
+```console
+$ ./speed
+```
+
 ### Em Python
 
 Para **cifrar**, basta executar o seguinte comando:
@@ -148,6 +153,12 @@ $ python3 e_des.py -d -p <palavra-passe>
 ```
 
 Depois é só usar o `stdin` para inserir o texto a decifrar e o `stdout` para obter o texto decifrado.
+
+
+Para **testar** a performance do algoritmo, basta executar o seguinte comando:
+```console
+$ python3 speed.py
+```
 
 
 #### Doxygen

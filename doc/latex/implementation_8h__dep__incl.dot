@@ -6,4 +6,6 @@ digraph "implementation.h"
   Node1 [label="implementation.h",height=0.2,width=0.4,color="black", fillcolor="grey75", style="filled", fontcolor="black",tooltip="Implementation of the e-des and des-ecb modes."];
   Node1 -> Node2 [dir="back",color="midnightblue",fontsize="10",style="solid"];
   Node2 [label="e-des.c",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$e-des_8c.html",tooltip="Implementation of the e-des and des-ecb modes."];
+  Node1 -> Node3 [dir="back",color="midnightblue",fontsize="10",style="solid"];
+  Node3 [label="speed.c",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$speed_8c.html",tooltip="Tests the performance of the encryption and decryption functions (ECB and E-DES implementations)"];
 }

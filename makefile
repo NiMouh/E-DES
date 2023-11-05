@@ -1,6 +1,6 @@
 CC = gcc
 LDFLAGS = -lcrypto
-TARGETS = e-des performance
+TARGETS = e-des speed
 OBJECTS = implementation.o
 
 all: $(TARGETS)
@@ -8,7 +8,7 @@ all: $(TARGETS)
 e-des: e-des.c $(OBJECTS)
 	$(CC) -o $@ $^ $(LDFLAGS)
 
-performance: performance.c $(OBJECTS)
+speed: speed.c $(OBJECTS)
 	$(CC) -o $@ $^ $(LDFLAGS)
 
 %.o: %.c

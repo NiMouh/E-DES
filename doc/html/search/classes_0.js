@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['s_5fbox_25',['s_box',['../structs__box.html',1,'']]]
+  ['s_5fbox_26',['s_box',['../structs__box.html',1,'']]]
 ];

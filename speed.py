@@ -1,5 +1,5 @@
 """!
-@file performance.py
+@file speed.py
 @brief This file contains the functions used to measure the performance of the E-DES algorithm.
 @author Ana Vidal (118408)
 @author Simão Andrade (118345)

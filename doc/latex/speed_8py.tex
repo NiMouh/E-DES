@@ -1,0 +1,90 @@
+\hypertarget{speed_8py}{}\doxysection{speed.\+py File Reference}
+\label{speed_8py}\index{speed.py@{speed.py}}
+
+
+This file contains the functions used to measure the performance of the E-\/\+DES algorithm.  
+
+
+\doxysubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+bytearray \mbox{\hyperlink{speed_8py_a4ad04a113562c6c7c193958f2e38de94}{speed.\+generate\+\_\+random\+\_\+data}} (int number\+\_\+of\+\_\+bytes)
+\begin{DoxyCompactList}\small\item\em This function generates random data. \end{DoxyCompactList}\item 
+None \mbox{\hyperlink{speed_8py_aa6564db1ef0596a1e5aea17986ca3abd}{speed.\+speed\+\_\+encrypt}} (bytearray number\+\_\+of\+\_\+tests, int number\+\_\+of\+\_\+bytes)
+\begin{DoxyCompactList}\small\item\em This function measures the encryption time of DES-\/\+ECB and E-\/\+DES. \end{DoxyCompactList}\item 
+None \mbox{\hyperlink{speed_8py_aac67919b9f9159b0adc2e81f3d0f04fd}{speed.\+speed\+\_\+decrypt}} (bytearray number\+\_\+of\+\_\+tests, int number\+\_\+of\+\_\+bytes)
+\begin{DoxyCompactList}\small\item\em This function measures the decryption time of DES-\/\+ECB and E-\/\+DES. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+This file contains the functions used to measure the performance of the E-\/\+DES algorithm. 
+
+\begin{DoxyAuthor}{Author}
+Ana Vidal (118408) 
+
+Simão Andrade (118345) 
+\end{DoxyAuthor}
+\begin{DoxyDate}{Date}
+2023-\/10-\/20 
+\end{DoxyDate}
+
+
+\doxysubsection{Function Documentation}
+\mbox{\Hypertarget{speed_8py_a4ad04a113562c6c7c193958f2e38de94}\label{speed_8py_a4ad04a113562c6c7c193958f2e38de94}} 
+\index{speed.py@{speed.py}!generate\_random\_data@{generate\_random\_data}}
+\index{generate\_random\_data@{generate\_random\_data}!speed.py@{speed.py}}
+\doxysubsubsection{\texorpdfstring{generate\_random\_data()}{generate\_random\_data()}}
+{\footnotesize\ttfamily  bytearray speed.\+generate\+\_\+random\+\_\+data (\begin{DoxyParamCaption}\item[{int}]{number\+\_\+of\+\_\+bytes }\end{DoxyParamCaption})}
+
+
+
+This function generates random data. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em number\+\_\+of\+\_\+bytes} & The number of bytes to generate.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+The random data. 
+\end{DoxyReturn}
+\mbox{\Hypertarget{speed_8py_aac67919b9f9159b0adc2e81f3d0f04fd}\label{speed_8py_aac67919b9f9159b0adc2e81f3d0f04fd}} 
+\index{speed.py@{speed.py}!speed\_decrypt@{speed\_decrypt}}
+\index{speed\_decrypt@{speed\_decrypt}!speed.py@{speed.py}}
+\doxysubsubsection{\texorpdfstring{speed\_decrypt()}{speed\_decrypt()}}
+{\footnotesize\ttfamily  None speed.\+speed\+\_\+decrypt (\begin{DoxyParamCaption}\item[{bytearray}]{number\+\_\+of\+\_\+tests,  }\item[{int}]{number\+\_\+of\+\_\+bytes }\end{DoxyParamCaption})}
+
+
+
+This function measures the decryption time of DES-\/\+ECB and E-\/\+DES. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em number\+\_\+of\+\_\+tests} & The number of tests to run. \\
+\hline
+{\em number\+\_\+of\+\_\+bytes} & The number of bytes to decrypt.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+None 
+\end{DoxyReturn}
+\mbox{\Hypertarget{speed_8py_aa6564db1ef0596a1e5aea17986ca3abd}\label{speed_8py_aa6564db1ef0596a1e5aea17986ca3abd}} 
+\index{speed.py@{speed.py}!speed\_encrypt@{speed\_encrypt}}
+\index{speed\_encrypt@{speed\_encrypt}!speed.py@{speed.py}}
+\doxysubsubsection{\texorpdfstring{speed\_encrypt()}{speed\_encrypt()}}
+{\footnotesize\ttfamily  None speed.\+speed\+\_\+encrypt (\begin{DoxyParamCaption}\item[{bytearray}]{number\+\_\+of\+\_\+tests,  }\item[{int}]{number\+\_\+of\+\_\+bytes }\end{DoxyParamCaption})}
+
+
+
+This function measures the encryption time of DES-\/\+ECB and E-\/\+DES. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em number\+\_\+of\+\_\+tests} & The number of tests to run. \\
+\hline
+{\em number\+\_\+of\+\_\+bytes} & The number of bytes to encrypt.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+None 
+\end{DoxyReturn}

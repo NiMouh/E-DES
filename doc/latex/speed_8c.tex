@@ -1,0 +1,83 @@
+\hypertarget{speed_8c}{}\doxysection{speed.\+c File Reference}
+\label{speed_8c}\index{speed.c@{speed.c}}
+
+
+Tests the performance of the encryption and decryption functions (ECB and E-\/\+DES implementations)  
+
+
+{\ttfamily \#include \char`\"{}implementation.\+h\char`\"{}}\newline
+Include dependency graph for speed.\+c\+:
+% FIG 0
+\doxysubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{speed_8c_a683411a81eefaa6610fe55aef27b1076}{generate\+\_\+random\+\_\+data}} (uint8\+\_\+t $\ast$buffer, size\+\_\+t buffer\+\_\+size)
+\item 
+void \mbox{\hyperlink{speed_8c_a8f91001b5f197ff3086672f90412ad91}{speed\+\_\+encrypt}} (const int number\+\_\+of\+\_\+tests, const size\+\_\+t number\+\_\+of\+\_\+bytes)
+\item 
+void \mbox{\hyperlink{speed_8c_a54dd3702fcc5db0f9b59dad6be49b8eb}{speed\+\_\+decrypt}} (const int number\+\_\+of\+\_\+tests, const size\+\_\+t number\+\_\+of\+\_\+bytes)
+\item 
+\mbox{\Hypertarget{speed_8c_a840291bc02cba5474a4cb46a9b9566fe}\label{speed_8c_a840291bc02cba5474a4cb46a9b9566fe}} 
+int {\bfseries main} (void)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Tests the performance of the encryption and decryption functions (ECB and E-\/\+DES implementations) 
+
+\begin{DoxyAuthor}{Author}
+Ana Vidal (118408) 
+
+Simão Andrade (118345) 
+\end{DoxyAuthor}
+\begin{DoxyDate}{Date}
+2023-\/10-\/20 
+\end{DoxyDate}
+
+
+\doxysubsection{Function Documentation}
+\mbox{\Hypertarget{speed_8c_a683411a81eefaa6610fe55aef27b1076}\label{speed_8c_a683411a81eefaa6610fe55aef27b1076}} 
+\index{speed.c@{speed.c}!generate\_random\_data@{generate\_random\_data}}
+\index{generate\_random\_data@{generate\_random\_data}!speed.c@{speed.c}}
+\doxysubsubsection{\texorpdfstring{generate\_random\_data()}{generate\_random\_data()}}
+{\footnotesize\ttfamily void generate\+\_\+random\+\_\+data (\begin{DoxyParamCaption}\item[{uint8\+\_\+t $\ast$}]{buffer,  }\item[{size\+\_\+t}]{buffer\+\_\+size }\end{DoxyParamCaption})}
+
+Function that generates random data using \textquotesingle{}/dev/urandom\textquotesingle{} and stores it in a buffer
+
+
+\begin{DoxyParams}{Parameters}
+{\em buffer} & pointer to the buffer (uint8\+\_\+t array) \\
+\hline
+{\em buffer\+\_\+size} & the buffer size (size\+\_\+t) \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{speed_8c_a54dd3702fcc5db0f9b59dad6be49b8eb}\label{speed_8c_a54dd3702fcc5db0f9b59dad6be49b8eb}} 
+\index{speed.c@{speed.c}!speed\_decrypt@{speed\_decrypt}}
+\index{speed\_decrypt@{speed\_decrypt}!speed.c@{speed.c}}
+\doxysubsubsection{\texorpdfstring{speed\_decrypt()}{speed\_decrypt()}}
+{\footnotesize\ttfamily void speed\+\_\+decrypt (\begin{DoxyParamCaption}\item[{const int}]{number\+\_\+of\+\_\+tests,  }\item[{const size\+\_\+t}]{number\+\_\+of\+\_\+bytes }\end{DoxyParamCaption})}
+
+Function that tests the speed of the decryption functions (ECB and E-\/\+DES implementations)
+
+
+\begin{DoxyParams}{Parameters}
+{\em number\+\_\+of\+\_\+tests} & number of tests to run (int) \\
+\hline
+{\em number\+\_\+of\+\_\+bytes} & number of bytes to encrypt/decrypt (size\+\_\+t) \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{speed_8c_a8f91001b5f197ff3086672f90412ad91}\label{speed_8c_a8f91001b5f197ff3086672f90412ad91}} 
+\index{speed.c@{speed.c}!speed\_encrypt@{speed\_encrypt}}
+\index{speed\_encrypt@{speed\_encrypt}!speed.c@{speed.c}}
+\doxysubsubsection{\texorpdfstring{speed\_encrypt()}{speed\_encrypt()}}
+{\footnotesize\ttfamily void speed\+\_\+encrypt (\begin{DoxyParamCaption}\item[{const int}]{number\+\_\+of\+\_\+tests,  }\item[{const size\+\_\+t}]{number\+\_\+of\+\_\+bytes }\end{DoxyParamCaption})}
+
+Function that tests the speed of the encryption functions (ECB and E-\/\+DES implementations)
+
+
+\begin{DoxyParams}{Parameters}
+{\em number\+\_\+of\+\_\+tests} & number of tests to run (int) \\
+\hline
+{\em number\+\_\+of\+\_\+bytes} & number of bytes to encrypt/decrypt (size\+\_\+t) \\
+\hline
+\end{DoxyParams}
