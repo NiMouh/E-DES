@@ -64,11 +64,11 @@ void \mbox{\hyperlink{implementation_8h_a0504c100aa3587c309efbf106f71cf6e}{read\
 \item 
 void \mbox{\hyperlink{implementation_8h_af37e1532fa7db123225bf2b6325c912f}{write\+\_\+bytes}} (const uint8\+\_\+t $\ast$bytes\+\_\+to\+\_\+write, size\+\_\+t number\+\_\+of\+\_\+bytes\+\_\+to\+\_\+write)
 \item 
-uint8\+\_\+t $\ast$ \mbox{\hyperlink{implementation_8h_abeb894ae07447c3fee13c88f747ba05a}{feistel\+\_\+function}} (const uint8\+\_\+t $\ast$input\+\_\+block, const uint8\+\_\+t $\ast$\mbox{\hyperlink{structs__box}{s\+\_\+box}})
+void \mbox{\hyperlink{implementation_8h_a42bdb055ac4187a3d13fb5c63e88c7af}{feistel\+\_\+function}} (const uint8\+\_\+t $\ast$input\+\_\+block, const uint8\+\_\+t $\ast$\mbox{\hyperlink{structs__box}{s\+\_\+box}}, uint8\+\_\+t $\ast$output\+\_\+block)
 \item 
-void \mbox{\hyperlink{implementation_8h_acb00c7c9a41dbddcab5f06882723b2c4}{feistel\+\_\+network}} (const uint8\+\_\+t $\ast$block, const struct \mbox{\hyperlink{structs__box}{s\+\_\+box}} $\ast$sboxes, uint8\+\_\+t $\ast$$\ast$cipher\+\_\+block)
+void \mbox{\hyperlink{implementation_8h_a19f53aa7d4275b9ce7653ac4fc7d8fa4}{feistel\+\_\+network}} (const uint8\+\_\+t $\ast$block, const struct \mbox{\hyperlink{structs__box}{s\+\_\+box}} $\ast$sboxes, uint8\+\_\+t $\ast$cipher\+\_\+block)
 \item 
-void \mbox{\hyperlink{implementation_8h_a64c61d4b449cc3e6c271a29c4cc37bc9}{inverse\+\_\+feistel\+\_\+network}} (const uint8\+\_\+t $\ast$block, const struct \mbox{\hyperlink{structs__box}{s\+\_\+box}} $\ast$sboxes, uint8\+\_\+t $\ast$$\ast$cipher\+\_\+block)
+void \mbox{\hyperlink{implementation_8h_a3555d880cc2d875aed29406fa1aee3e0}{inverse\+\_\+feistel\+\_\+network}} (const uint8\+\_\+t $\ast$block, const struct \mbox{\hyperlink{structs__box}{s\+\_\+box}} $\ast$sboxes, uint8\+\_\+t $\ast$decipher\+\_\+block)
 \item 
 void \mbox{\hyperlink{implementation_8h_a6b205e29d17794d8a2d96a1017bb88bf}{generate\+\_\+key}} (const uint8\+\_\+t $\ast$password, uint8\+\_\+t $\ast$key)
 \item 
@@ -205,11 +205,11 @@ Encrypt Function, receives the plaintext, the password and a pointer to the ciph
 {\em ciphertext\+\_\+size} & pointer to the ciphertext size (size\+\_\+t) \\
 \hline
 \end{DoxyParams}
-\mbox{\Hypertarget{implementation_8h_abeb894ae07447c3fee13c88f747ba05a}\label{implementation_8h_abeb894ae07447c3fee13c88f747ba05a}} 
+\mbox{\Hypertarget{implementation_8h_a42bdb055ac4187a3d13fb5c63e88c7af}\label{implementation_8h_a42bdb055ac4187a3d13fb5c63e88c7af}} 
 \index{implementation.h@{implementation.h}!feistel\_function@{feistel\_function}}
 \index{feistel\_function@{feistel\_function}!implementation.h@{implementation.h}}
 \doxysubsubsection{\texorpdfstring{feistel\_function()}{feistel\_function()}}
-{\footnotesize\ttfamily uint8\+\_\+t$\ast$ feistel\+\_\+function (\begin{DoxyParamCaption}\item[{const uint8\+\_\+t $\ast$}]{input\+\_\+block,  }\item[{const uint8\+\_\+t $\ast$}]{s\+\_\+box }\end{DoxyParamCaption})}
+{\footnotesize\ttfamily void feistel\+\_\+function (\begin{DoxyParamCaption}\item[{const uint8\+\_\+t $\ast$}]{input\+\_\+block,  }\item[{const uint8\+\_\+t $\ast$}]{s\+\_\+box,  }\item[{uint8\+\_\+t $\ast$}]{output\+\_\+block }\end{DoxyParamCaption})}
 
 Function that does the feistel function operation, it receives the input block and the sbox
 
@@ -217,17 +217,16 @@ Function that does the feistel function operation, it receives the input block a
 \begin{DoxyParams}{Parameters}
 {\em input\+\_\+block} & the input block (uint8\+\_\+t array) \\
 \hline
-{\em \mbox{\hyperlink{structs__box}{s\+\_\+box}}} & the sbox (uint8\+\_\+t array)\\
+{\em \mbox{\hyperlink{structs__box}{s\+\_\+box}}} & the sbox (uint8\+\_\+t array) \\
+\hline
+{\em output\+\_\+block} & the output block (uint8\+\_\+t array) \\
 \hline
 \end{DoxyParams}
-\begin{DoxyReturn}{Returns}
-the output block (uint8\+\_\+t array) 
-\end{DoxyReturn}
-\mbox{\Hypertarget{implementation_8h_acb00c7c9a41dbddcab5f06882723b2c4}\label{implementation_8h_acb00c7c9a41dbddcab5f06882723b2c4}} 
+\mbox{\Hypertarget{implementation_8h_a19f53aa7d4275b9ce7653ac4fc7d8fa4}\label{implementation_8h_a19f53aa7d4275b9ce7653ac4fc7d8fa4}} 
 \index{implementation.h@{implementation.h}!feistel\_network@{feistel\_network}}
 \index{feistel\_network@{feistel\_network}!implementation.h@{implementation.h}}
 \doxysubsubsection{\texorpdfstring{feistel\_network()}{feistel\_network()}}
-{\footnotesize\ttfamily void feistel\+\_\+network (\begin{DoxyParamCaption}\item[{const uint8\+\_\+t $\ast$}]{block,  }\item[{const struct \mbox{\hyperlink{structs__box}{s\+\_\+box}} $\ast$}]{sboxes,  }\item[{uint8\+\_\+t $\ast$$\ast$}]{cipher\+\_\+block }\end{DoxyParamCaption})}
+{\footnotesize\ttfamily void feistel\+\_\+network (\begin{DoxyParamCaption}\item[{const uint8\+\_\+t $\ast$}]{block,  }\item[{const struct \mbox{\hyperlink{structs__box}{s\+\_\+box}} $\ast$}]{sboxes,  }\item[{uint8\+\_\+t $\ast$}]{cipher\+\_\+block }\end{DoxyParamCaption})}
 
 Function that handles the feistel network used to cipher, it receives the block that will be divided in two halfs, the sboxes and a pointer to the cipher block
 
@@ -237,7 +236,7 @@ Function that handles the feistel network used to cipher, it receives the block 
 \hline
 {\em sboxes} & the sboxes (struct \mbox{\hyperlink{structs__box}{s\+\_\+box}} array) \\
 \hline
-{\em cipher\+\_\+block} & pointer of the cipher block pointer (uint8\+\_\+t array) \\
+{\em cipher\+\_\+block} & pointer to the decipher block (uint8\+\_\+t array) \\
 \hline
 \end{DoxyParams}
 \mbox{\Hypertarget{implementation_8h_a6b205e29d17794d8a2d96a1017bb88bf}\label{implementation_8h_a6b205e29d17794d8a2d96a1017bb88bf}} 
@@ -285,11 +284,11 @@ Function that generates the single sbox by the key
 {\em single\+\_\+sbox} & pointer to the single sbox (uint8\+\_\+t array) \\
 \hline
 \end{DoxyParams}
-\mbox{\Hypertarget{implementation_8h_a64c61d4b449cc3e6c271a29c4cc37bc9}\label{implementation_8h_a64c61d4b449cc3e6c271a29c4cc37bc9}} 
+\mbox{\Hypertarget{implementation_8h_a3555d880cc2d875aed29406fa1aee3e0}\label{implementation_8h_a3555d880cc2d875aed29406fa1aee3e0}} 
 \index{implementation.h@{implementation.h}!inverse\_feistel\_network@{inverse\_feistel\_network}}
 \index{inverse\_feistel\_network@{inverse\_feistel\_network}!implementation.h@{implementation.h}}
 \doxysubsubsection{\texorpdfstring{inverse\_feistel\_network()}{inverse\_feistel\_network()}}
-{\footnotesize\ttfamily void inverse\+\_\+feistel\+\_\+network (\begin{DoxyParamCaption}\item[{const uint8\+\_\+t $\ast$}]{block,  }\item[{const struct \mbox{\hyperlink{structs__box}{s\+\_\+box}} $\ast$}]{sboxes,  }\item[{uint8\+\_\+t $\ast$$\ast$}]{cipher\+\_\+block }\end{DoxyParamCaption})}
+{\footnotesize\ttfamily void inverse\+\_\+feistel\+\_\+network (\begin{DoxyParamCaption}\item[{const uint8\+\_\+t $\ast$}]{block,  }\item[{const struct \mbox{\hyperlink{structs__box}{s\+\_\+box}} $\ast$}]{sboxes,  }\item[{uint8\+\_\+t $\ast$}]{decipher\+\_\+block }\end{DoxyParamCaption})}
 
 Function that handles the inverse feistel network used to decipher, it receives the block that will be divided in two halfs, the sboxes and a pointer to the cipher block
 
@@ -299,7 +298,7 @@ Function that handles the inverse feistel network used to decipher, it receives 
 \hline
 {\em sboxes} & the sboxes (struct \mbox{\hyperlink{structs__box}{s\+\_\+box}} array) \\
 \hline
-{\em cipher\+\_\+block} & pointer of the cipher block pointer (uint8\+\_\+t array) \\
+{\em decipher\+\_\+block} & pointer to the decipher block (uint8\+\_\+t array) \\
 \hline
 \end{DoxyParams}
 \mbox{\Hypertarget{implementation_8h_a0504c100aa3587c309efbf106f71cf6e}\label{implementation_8h_a0504c100aa3587c309efbf106f71cf6e}} 

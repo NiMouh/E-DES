@@ -139,12 +139,12 @@ Functions</h2></td></tr>
 <tr class="separator:a0504c100aa3587c309efbf106f71cf6e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af37e1532fa7db123225bf2b6325c912f"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="implementation_8h.html#af37e1532fa7db123225bf2b6325c912f">write_bytes</a> (const uint8_t *bytes_to_write, size_t number_of_bytes_to_write)</td></tr>
 <tr class="separator:af37e1532fa7db123225bf2b6325c912f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:abeb894ae07447c3fee13c88f747ba05a"><td class="memItemLeft" align="right" valign="top">uint8_t *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="implementation_8h.html#abeb894ae07447c3fee13c88f747ba05a">feistel_function</a> (const uint8_t *input_block, const uint8_t *<a class="el" href="structs__box.html">s_box</a>)</td></tr>
-<tr class="separator:abeb894ae07447c3fee13c88f747ba05a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:acb00c7c9a41dbddcab5f06882723b2c4"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="implementation_8h.html#acb00c7c9a41dbddcab5f06882723b2c4">feistel_network</a> (const uint8_t *block, const struct <a class="el" href="structs__box.html">s_box</a> *sboxes, uint8_t **cipher_block)</td></tr>
-<tr class="separator:acb00c7c9a41dbddcab5f06882723b2c4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a64c61d4b449cc3e6c271a29c4cc37bc9"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="implementation_8h.html#a64c61d4b449cc3e6c271a29c4cc37bc9">inverse_feistel_network</a> (const uint8_t *block, const struct <a class="el" href="structs__box.html">s_box</a> *sboxes, uint8_t **cipher_block)</td></tr>
-<tr class="separator:a64c61d4b449cc3e6c271a29c4cc37bc9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a42bdb055ac4187a3d13fb5c63e88c7af"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="implementation_8h.html#a42bdb055ac4187a3d13fb5c63e88c7af">feistel_function</a> (const uint8_t *input_block, const uint8_t *<a class="el" href="structs__box.html">s_box</a>, uint8_t *output_block)</td></tr>
+<tr class="separator:a42bdb055ac4187a3d13fb5c63e88c7af"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a19f53aa7d4275b9ce7653ac4fc7d8fa4"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="implementation_8h.html#a19f53aa7d4275b9ce7653ac4fc7d8fa4">feistel_network</a> (const uint8_t *block, const struct <a class="el" href="structs__box.html">s_box</a> *sboxes, uint8_t *cipher_block)</td></tr>
+<tr class="separator:a19f53aa7d4275b9ce7653ac4fc7d8fa4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3555d880cc2d875aed29406fa1aee3e0"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="implementation_8h.html#a3555d880cc2d875aed29406fa1aee3e0">inverse_feistel_network</a> (const uint8_t *block, const struct <a class="el" href="structs__box.html">s_box</a> *sboxes, uint8_t *decipher_block)</td></tr>
+<tr class="separator:a3555d880cc2d875aed29406fa1aee3e0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6b205e29d17794d8a2d96a1017bb88bf"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="implementation_8h.html#a6b205e29d17794d8a2d96a1017bb88bf">generate_key</a> (const uint8_t *password, uint8_t *key)</td></tr>
 <tr class="separator:a6b205e29d17794d8a2d96a1017bb88bf"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae4f5aff12009b175ac125f7ee1b8c757"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="implementation_8h.html#ae4f5aff12009b175ac125f7ee1b8c757">generate_single_sbox</a> (const uint8_t *password, uint8_t *single_sbox)</td></tr>
@@ -437,14 +437,14 @@ Simão Andrade (118345) </dd></dl>
 
 </div>
 </div>
-<a id="abeb894ae07447c3fee13c88f747ba05a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#abeb894ae07447c3fee13c88f747ba05a">&#9670;&nbsp;</a></span>feistel_function()</h2>
+<a id="a42bdb055ac4187a3d13fb5c63e88c7af"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a42bdb055ac4187a3d13fb5c63e88c7af">&#9670;&nbsp;</a></span>feistel_function()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">uint8_t* feistel_function </td>
+          <td class="memname">void feistel_function </td>
           <td>(</td>
           <td class="paramtype">const uint8_t *&#160;</td>
           <td class="paramname"><em>input_block</em>, </td>
@@ -453,7 +453,13 @@ Simão Andrade (118345) </dd></dl>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">const uint8_t *&#160;</td>
-          <td class="paramname"><em>s_box</em>&#160;</td>
+          <td class="paramname"><em>s_box</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint8_t *&#160;</td>
+          <td class="paramname"><em>output_block</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -466,16 +472,16 @@ Simão Andrade (118345) </dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">input_block</td><td>the input block (uint8_t array) </td></tr>
-    <tr><td class="paramname"><a class="el" href="structs__box.html">s_box</a></td><td>the sbox (uint8_t array)</td></tr>
+    <tr><td class="paramname"><a class="el" href="structs__box.html">s_box</a></td><td>the sbox (uint8_t array) </td></tr>
+    <tr><td class="paramname">output_block</td><td>the output block (uint8_t array) </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>the output block (uint8_t array) </dd></dl>
 
 </div>
 </div>
-<a id="acb00c7c9a41dbddcab5f06882723b2c4"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#acb00c7c9a41dbddcab5f06882723b2c4">&#9670;&nbsp;</a></span>feistel_network()</h2>
+<a id="a19f53aa7d4275b9ce7653ac4fc7d8fa4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a19f53aa7d4275b9ce7653ac4fc7d8fa4">&#9670;&nbsp;</a></span>feistel_network()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -495,7 +501,7 @@ Simão Andrade (118345) </dd></dl>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">uint8_t **&#160;</td>
+          <td class="paramtype">uint8_t *&#160;</td>
           <td class="paramname"><em>cipher_block</em>&#160;</td>
         </tr>
         <tr>
@@ -510,7 +516,7 @@ Simão Andrade (118345) </dd></dl>
   <table class="params">
     <tr><td class="paramname">block</td><td>the block (uint8_t array) </td></tr>
     <tr><td class="paramname">sboxes</td><td>the sboxes (struct <a class="el" href="structs__box.html">s_box</a> array) </td></tr>
-    <tr><td class="paramname">cipher_block</td><td>pointer of the cipher block pointer (uint8_t array) </td></tr>
+    <tr><td class="paramname">cipher_block</td><td>pointer to the decipher block (uint8_t array) </td></tr>
   </table>
   </dd>
 </dl>
@@ -625,8 +631,8 @@ Simão Andrade (118345) </dd></dl>
 
 </div>
 </div>
-<a id="a64c61d4b449cc3e6c271a29c4cc37bc9"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a64c61d4b449cc3e6c271a29c4cc37bc9">&#9670;&nbsp;</a></span>inverse_feistel_network()</h2>
+<a id="a3555d880cc2d875aed29406fa1aee3e0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3555d880cc2d875aed29406fa1aee3e0">&#9670;&nbsp;</a></span>inverse_feistel_network()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -646,8 +652,8 @@ Simão Andrade (118345) </dd></dl>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">uint8_t **&#160;</td>
-          <td class="paramname"><em>cipher_block</em>&#160;</td>
+          <td class="paramtype">uint8_t *&#160;</td>
+          <td class="paramname"><em>decipher_block</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -661,7 +667,7 @@ Simão Andrade (118345) </dd></dl>
   <table class="params">
     <tr><td class="paramname">block</td><td>the block (uint8_t array) </td></tr>
     <tr><td class="paramname">sboxes</td><td>the sboxes (struct <a class="el" href="structs__box.html">s_box</a> array) </td></tr>
-    <tr><td class="paramname">cipher_block</td><td>pointer of the cipher block pointer (uint8_t array) </td></tr>
+    <tr><td class="paramname">decipher_block</td><td>pointer to the decipher block (uint8_t array) </td></tr>
   </table>
   </dd>
 </dl>

@@ -51,7 +51,6 @@ void feistel_network(const uint8_t *block, const struct s_box *sboxes, uint8_t *
 
     for (int round = 0; round < NUMBER_OF_ROUNDS; round++)
     {
-        
         feistel_function(R, sboxes[round].sbox, feistel_result);
 
         for (int index = 0; index < HALF_BLOCK_SIZE; index++)
@@ -297,17 +296,17 @@ void encrypt(const uint8_t *plaintext, const uint8_t *password, uint8_t **cipher
         exit(1);
     }
 
+    uint8_t *cipher_block = (uint8_t *)malloc(BLOCK_SIZE);
+
+    if (cipher_block == NULL) // memory allocation error
+    {
+        printf("Error allocating memory for cipher block\n");
+        exit(1);
+    }
+
     for (size_t block_index = 0; block_index < padded_plaintext_size; block_index += BLOCK_SIZE)
     {
         const uint8_t *block = padded_plaintext + block_index;
-
-        uint8_t *cipher_block = (uint8_t *)malloc(BLOCK_SIZE);
-
-        if (cipher_block == NULL) // memory allocation error
-        {
-            printf("Error allocating memory for cipher block\n");
-            exit(1);
-        }
 
         feistel_network(block, sboxes, cipher_block);
 
@@ -315,15 +314,13 @@ void encrypt(const uint8_t *plaintext, const uint8_t *password, uint8_t **cipher
         {
             (*ciphertext)[block_index + index] = cipher_block[index];
         }
-
-        // Free the block and cipher_block memory
-        free(cipher_block);
     }
 
     // Update the ciphertext size
     *ciphertext_size = padded_plaintext_size;
 
     // Free memory
+    free(cipher_block);
     free(sboxes);
     free(padded_plaintext);
 }
@@ -349,17 +346,17 @@ void decrypt(const uint8_t *ciphertext, const size_t ciphertext_size, const uint
         exit(1);
     }
 
+    uint8_t *decipher_block = (uint8_t *)malloc(BLOCK_SIZE);
+
+    if (decipher_block == NULL) // memory allocation error
+    {
+        printf("Error allocating memory for decipher block\n");
+        exit(1);
+    }
+
     for (size_t block_index = 0; block_index < ciphertext_size; block_index += BLOCK_SIZE)
     {
         const uint8_t *block = ciphertext + block_index;
-
-        uint8_t *decipher_block = (uint8_t *)malloc(BLOCK_SIZE);
-
-        if (decipher_block == NULL) // memory allocation error
-        {
-            printf("Error allocating memory for decipher block\n");
-            exit(1);
-        }
 
         inverse_feistel_network(block, sboxes, decipher_block);
 
@@ -367,18 +364,17 @@ void decrypt(const uint8_t *ciphertext, const size_t ciphertext_size, const uint
         {
             padded_plaintext[block_index + index] = decipher_block[index];
         }
-
-        free(decipher_block);
     }
 
     remove_padding(padded_plaintext, padded_plaintext_size, plaintext, plaintext_size);
 
     // Free memory
     free(sboxes);
+    free(decipher_block);
     free(padded_plaintext);
 }
 
-void ecb_encrypt(const uint8_t *plaintext, const uint8_t *password, uint8_t **ciphertext, size_t *ciphertext_size) 
+void ecb_encrypt(const uint8_t *plaintext, const uint8_t *password, uint8_t **ciphertext, size_t *ciphertext_size)
 {
     // Declare key schedule
     DES_cblock des_key;
