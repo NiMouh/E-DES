@@ -108,7 +108,7 @@ void speed_encrypt(const int number_of_tests, const size_t number_of_bytes)
         clock_t start_time = clock();
         for (int block_index = 0; block_index < number_of_bytes; block_index += BLOCK_SIZE)
         {
-            feistel_network((uint8_t *) (random_bytes + block_index), sboxes, (uint8_t *) (random_bytes + block_index));
+            feistel_network((uint8_t *) (random_bytes + block_index), sboxes);
         }
         clock_t end_time = clock();
 
@@ -220,7 +220,7 @@ void speed_decrypt(const int number_of_tests, const size_t number_of_bytes)
         clock_t start_time = clock();
         for (int block_index = 0; block_index < number_of_bytes; block_index += BLOCK_SIZE)
         {
-            inverse_feistel_network((uint8_t *) (random_bytes + block_index), sboxes, (uint8_t *) (random_bytes + block_index));
+            inverse_feistel_network((uint8_t *) (random_bytes + block_index), sboxes);
         }
         clock_t end_time = clock();
 

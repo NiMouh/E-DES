@@ -80,18 +80,16 @@ void feistel_function(const uint8_t *input_block, const uint8_t *s_box, uint8_t 
  *
  * @param block the block (uint8_t array)
  * @param sboxes the sboxes (struct s_box array)
- * @param cipher_block pointer to the decipher block (uint8_t array)
  */
-void feistel_network(const uint8_t *block, const struct s_box *sboxes, uint8_t *cipher_block);
+void feistel_network(uint8_t *block, const struct s_box *sboxes);
 
 /**
  * Function that handles the inverse feistel network used to decipher, it receives the block that will be divided in two halfs, the sboxes and a pointer to the cipher block
  *
  * @param block the block (uint8_t array)
  * @param sboxes the sboxes (struct s_box array)
- * @param decipher_block pointer to the decipher block (uint8_t array)
  */
-void inverse_feistel_network(const uint8_t *block, const struct s_box *sboxes, uint8_t *decipher_block);
+void inverse_feistel_network(const uint8_t *block, const struct s_box *sboxes);
 
 /**
  * Function that generates the key from the password, using SHA256

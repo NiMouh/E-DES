@@ -36,18 +36,11 @@ void feistel_function(const uint8_t *input_block, const uint8_t *s_box, uint8_t 
     output_block[3] = s_box[index];
 }
 
-void feistel_network(const uint8_t *block, const struct s_box *sboxes, uint8_t *cipher_block)
+void feistel_network(uint8_t *block, const struct s_box *sboxes)
 {
-    uint8_t *L = (uint8_t *)malloc(HALF_BLOCK_SIZE);
-    uint8_t *R = (uint8_t *)malloc(HALF_BLOCK_SIZE);
+    uint8_t *L = block;
+    uint8_t *R = block + HALF_BLOCK_SIZE;
     uint8_t *feistel_result = (uint8_t *)malloc(HALF_BLOCK_SIZE);
-
-    // Split the block into two halves (L and R)
-    for (int index = 0; index < HALF_BLOCK_SIZE; index++)
-    {
-        L[index] = block[index];
-        R[index] = block[index + HALF_BLOCK_SIZE];
-    }
 
     for (int round = 0; round < NUMBER_OF_ROUNDS; round++)
     {
@@ -60,31 +53,14 @@ void feistel_network(const uint8_t *block, const struct s_box *sboxes, uint8_t *
             R[index] = temp;
         }
     }
-
-    // Concatenate the left and right halves
-    for (int index = 0; index < HALF_BLOCK_SIZE; index++)
-    {
-        cipher_block[index] = L[index];
-        cipher_block[index + HALF_BLOCK_SIZE] = R[index];
-    }
-
-    free(L);
-    free(R);
     free(feistel_result);
 }
 
-void inverse_feistel_network(const uint8_t *block, const struct s_box *sboxes, uint8_t *decipher_block)
+void inverse_feistel_network(const uint8_t *block, const struct s_box *sboxes)
 {
-    uint8_t *L = (uint8_t *)malloc(HALF_BLOCK_SIZE);
-    uint8_t *R = (uint8_t *)malloc(HALF_BLOCK_SIZE);
+    uint8_t *L = block;
+    uint8_t *R = block + HALF_BLOCK_SIZE;
     uint8_t *feistel_result = (uint8_t *)malloc(HALF_BLOCK_SIZE);
-
-    // Split the block into two halves (L and R)
-    for (int index = 0; index < HALF_BLOCK_SIZE; index++)
-    {
-        L[index] = block[index];
-        R[index] = block[index + HALF_BLOCK_SIZE];
-    }
 
     for (int round = NUMBER_OF_ROUNDS - 1; round >= 0; round--)
     {
@@ -97,16 +73,6 @@ void inverse_feistel_network(const uint8_t *block, const struct s_box *sboxes, u
             L[index] = temp;
         }
     }
-
-    // Concatenate the left and right halves
-    for (int index = 0; index < HALF_BLOCK_SIZE; index++)
-    {
-        decipher_block[index] = L[index];
-        decipher_block[index + HALF_BLOCK_SIZE] = R[index];
-    }
-
-    free(L);
-    free(R);
     free(feistel_result);
 }
 
@@ -296,23 +262,14 @@ void encrypt(const uint8_t *plaintext, const uint8_t *password, uint8_t **cipher
         exit(1);
     }
 
-    uint8_t *cipher_block = (uint8_t *)malloc(BLOCK_SIZE);
-
-    if (cipher_block == NULL) // memory allocation error
-    {
-        printf("Error allocating memory for cipher block\n");
-        exit(1);
-    }
-
     for (size_t block_index = 0; block_index < padded_plaintext_size; block_index += BLOCK_SIZE)
     {
-        const uint8_t *block = padded_plaintext + block_index;
 
-        feistel_network(block, sboxes, cipher_block);
+        feistel_network((uint8_t *) (padded_plaintext + block_index), sboxes);
 
         for (int index = 0; index < BLOCK_SIZE; index++)
         {
-            (*ciphertext)[block_index + index] = cipher_block[index];
+            (*ciphertext)[block_index + index] = padded_plaintext[block_index + index];
         }
     }
 
@@ -320,9 +277,7 @@ void encrypt(const uint8_t *plaintext, const uint8_t *password, uint8_t **cipher
     *ciphertext_size = padded_plaintext_size;
 
     // Free memory
-    free(cipher_block);
     free(sboxes);
-    free(padded_plaintext);
 }
 
 void decrypt(const uint8_t *ciphertext, const size_t ciphertext_size, const uint8_t *password, uint8_t **plaintext, size_t *plaintext_size)
@@ -346,23 +301,14 @@ void decrypt(const uint8_t *ciphertext, const size_t ciphertext_size, const uint
         exit(1);
     }
 
-    uint8_t *decipher_block = (uint8_t *)malloc(BLOCK_SIZE);
-
-    if (decipher_block == NULL) // memory allocation error
-    {
-        printf("Error allocating memory for decipher block\n");
-        exit(1);
-    }
-
     for (size_t block_index = 0; block_index < ciphertext_size; block_index += BLOCK_SIZE)
     {
-        const uint8_t *block = ciphertext + block_index;
 
-        inverse_feistel_network(block, sboxes, decipher_block);
+        inverse_feistel_network((uint8_t *) (ciphertext + block_index), sboxes);
 
         for (int index = 0; index < BLOCK_SIZE; index++)
         {
-            padded_plaintext[block_index + index] = decipher_block[index];
+            padded_plaintext[block_index + index] = ciphertext[block_index + index];
         }
     }
 
@@ -370,7 +316,6 @@ void decrypt(const uint8_t *ciphertext, const size_t ciphertext_size, const uint
 
     // Free memory
     free(sboxes);
-    free(decipher_block);
     free(padded_plaintext);
 }
 
