@@ -21,16 +21,8 @@ void write_bytes(const uint8_t *bytes_to_write, const size_t number_of_bytes_to_
     }
 }
 
-uint8_t *feistel_function(const uint8_t *input_block, const uint8_t *s_box)
+void feistel_function(const uint8_t *input_block, const uint8_t *s_box, uint8_t *output_block)
 {
-    uint8_t *output_block = (uint8_t *)malloc(HALF_BLOCK_SIZE);
-
-    if (output_block == NULL) // memory allocation error
-    {
-        printf("Error allocating memory for output block\n");
-        exit(1);
-    }
-
     uint8_t index = input_block[3];
     output_block[0] = s_box[index];
 
@@ -42,17 +34,15 @@ uint8_t *feistel_function(const uint8_t *input_block, const uint8_t *s_box)
 
     index = index + input_block[0];
     output_block[3] = s_box[index];
-
-    return output_block;
 }
 
-void feistel_network(const uint8_t *block, const struct s_box *sboxes, uint8_t **cipher_block)
+void feistel_network(const uint8_t *block, const struct s_box *sboxes, uint8_t *cipher_block)
 {
-    uint8_t L[HALF_BLOCK_SIZE];
-    uint8_t R[HALF_BLOCK_SIZE];
-    uint8_t M[HALF_BLOCK_SIZE];
+    uint8_t *L = (uint8_t *)malloc(HALF_BLOCK_SIZE);
+    uint8_t *R = (uint8_t *)malloc(HALF_BLOCK_SIZE);
+    uint8_t *feistel_result = (uint8_t *)malloc(HALF_BLOCK_SIZE);
 
-    // Split the block in two halfs (L and R)
+    // Split the block into two halves (L and R)
     for (int index = 0; index < HALF_BLOCK_SIZE; index++)
     {
         L[index] = block[index];
@@ -61,41 +51,36 @@ void feistel_network(const uint8_t *block, const struct s_box *sboxes, uint8_t *
 
     for (int round = 0; round < NUMBER_OF_ROUNDS; round++)
     {
-        // Copy the right to a temporary variable
-        for (int index = 0; index < HALF_BLOCK_SIZE; index++)
-        {
-            M[index] = R[index];
-        }
-
-        // Apply the feistel function to the right half
-        uint8_t *feistel_result = feistel_function(R, sboxes[round].sbox);
+        
+        feistel_function(R, sboxes[round].sbox, feistel_result);
 
         for (int index = 0; index < HALF_BLOCK_SIZE; index++)
         {
-            R[index] = L[index] ^ feistel_result[index];
-        }
-
-        for (int index = 0; index < HALF_BLOCK_SIZE; index++)
-        {
-            L[index] = M[index];
+            uint8_t temp = L[index] ^ feistel_result[index];
+            L[index] = R[index];
+            R[index] = temp;
         }
     }
 
-    // Concatenate the left and right halfs
+    // Concatenate the left and right halves
     for (int index = 0; index < HALF_BLOCK_SIZE; index++)
     {
-        (*cipher_block)[index] = L[index];
-        (*cipher_block)[index + HALF_BLOCK_SIZE] = R[index];
+        cipher_block[index] = L[index];
+        cipher_block[index + HALF_BLOCK_SIZE] = R[index];
     }
+
+    free(L);
+    free(R);
+    free(feistel_result);
 }
 
-void inverse_feistel_network(const uint8_t *block, const struct s_box *sboxes, uint8_t **cipher_block)
+void inverse_feistel_network(const uint8_t *block, const struct s_box *sboxes, uint8_t *decipher_block)
 {
-    uint8_t L[HALF_BLOCK_SIZE];
-    uint8_t R[HALF_BLOCK_SIZE];
-    uint8_t M[HALF_BLOCK_SIZE];
+    uint8_t *L = (uint8_t *)malloc(HALF_BLOCK_SIZE);
+    uint8_t *R = (uint8_t *)malloc(HALF_BLOCK_SIZE);
+    uint8_t *feistel_result = (uint8_t *)malloc(HALF_BLOCK_SIZE);
 
-    // Split the block in two halfs (L and R)
+    // Split the block into two halves (L and R)
     for (int index = 0; index < HALF_BLOCK_SIZE; index++)
     {
         L[index] = block[index];
@@ -104,32 +89,26 @@ void inverse_feistel_network(const uint8_t *block, const struct s_box *sboxes, u
 
     for (int round = NUMBER_OF_ROUNDS - 1; round >= 0; round--)
     {
-        // Copy the left to a temporary variable
-        for (int index = 0; index < HALF_BLOCK_SIZE; index++)
-        {
-            M[index] = L[index];
-        }
-
-        // Apply the inverse Feistel function to the right half
-        uint8_t *feistel_result = feistel_function(L, sboxes[round].sbox);
+        feistel_function(L, sboxes[round].sbox, feistel_result);
 
         for (int index = 0; index < HALF_BLOCK_SIZE; index++)
         {
-            L[index] = R[index] ^ feistel_result[index];
-        }
-
-        for (int index = 0; index < HALF_BLOCK_SIZE; index++)
-        {
-            R[index] = M[index];
+            uint8_t temp = R[index] ^ feistel_result[index];
+            R[index] = L[index];
+            L[index] = temp;
         }
     }
 
-    // Concatenate the left and right halfs
+    // Concatenate the left and right halves
     for (int index = 0; index < HALF_BLOCK_SIZE; index++)
     {
-        (*cipher_block)[index] = L[index];
-        (*cipher_block)[index + HALF_BLOCK_SIZE] = R[index];
+        decipher_block[index] = L[index];
+        decipher_block[index + HALF_BLOCK_SIZE] = R[index];
     }
+
+    free(L);
+    free(R);
+    free(feistel_result);
 }
 
 void generate_key(const uint8_t *password, uint8_t *key)
@@ -330,7 +309,7 @@ void encrypt(const uint8_t *plaintext, const uint8_t *password, uint8_t **cipher
             exit(1);
         }
 
-        feistel_network(block, sboxes, &cipher_block);
+        feistel_network(block, sboxes, cipher_block);
 
         for (int index = 0; index < BLOCK_SIZE; index++)
         {
@@ -382,7 +361,7 @@ void decrypt(const uint8_t *ciphertext, const size_t ciphertext_size, const uint
             exit(1);
         }
 
-        inverse_feistel_network(block, sboxes, &decipher_block);
+        inverse_feistel_network(block, sboxes, decipher_block);
 
         for (int index = 0; index < BLOCK_SIZE; index++)
         {

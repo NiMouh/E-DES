@@ -98,9 +98,8 @@ void speed_encrypt(const int number_of_tests, const size_t number_of_bytes)
     generate_sboxes(password, sboxes);
 
     clock_t *time_list_edes = (clock_t*)malloc(number_of_tests * sizeof(clock_t));
-    uint8_t *cipher_block = (uint8_t *)malloc(BLOCK_SIZE * sizeof(uint8_t));
 
-    if (time_list_edes == NULL || cipher_block == NULL) {
+    if (time_list_edes == NULL) {
         printf("Memory allocation error\n");
         exit(1);
     }
@@ -109,14 +108,12 @@ void speed_encrypt(const int number_of_tests, const size_t number_of_bytes)
         clock_t start_time = clock();
         for (int block_index = 0; block_index < number_of_bytes; block_index += BLOCK_SIZE)
         {
-            // TODO: Add feistel_network(const uint8_t *block, const struct s_box *sboxes, uint8_t **cipher_block)
+            feistel_network((uint8_t *) (random_bytes + block_index), sboxes, (uint8_t *) (random_bytes + block_index));
         }
         clock_t end_time = clock();
 
         time_list_edes[test] = end_time - start_time;
     }
-
-    free(cipher_block);
     free(sboxes);
 
     // Print the results (Min, Max, Average) in milliseconds
@@ -223,7 +220,7 @@ void speed_decrypt(const int number_of_tests, const size_t number_of_bytes)
         clock_t start_time = clock();
         for (int block_index = 0; block_index < number_of_bytes; block_index += BLOCK_SIZE)
         {
-            // TODO: Add inverse_feistel_network(const uint8_t *block, const struct s_box *sboxes, uint8_t **cipher_block)
+            inverse_feistel_network((uint8_t *) (random_bytes + block_index), sboxes, (uint8_t *) (random_bytes + block_index));
         }
         clock_t end_time = clock();
 
@@ -255,8 +252,7 @@ void speed_decrypt(const int number_of_tests, const size_t number_of_bytes)
 
 
 int main(void){
-    speed_encrypt(NUMBER_OF_TESTS, BUFFER_SIZE); // TODO : FIX THIS FUNCTION
-
+    speed_encrypt(NUMBER_OF_TESTS, BUFFER_SIZE);
     // speed_decrypt(NUMBER_OF_TESTS, BUFFER_SIZE);
 
     return 0;

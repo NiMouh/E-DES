@@ -1,0 +1,8 @@
+DES-ECB CIPHER
+Minium: 0.037000 ms
+Maximum: 4.806000 ms
+Average: 0.038461 ms
+E-DES CIPHER
+Minium: 0.092000 ms
+Maximum: 0.617000 ms
+Average: 0.118969 ms
