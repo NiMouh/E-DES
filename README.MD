@@ -1,4 +1,4 @@
-# E-DES (Enhanced Data Encryption Standard)
+# E-DES (*Enhanced Data Encryption Standard*)
 
 ## Objetivo
  - Este projeto é uma modificação do algoritmo DES. 
